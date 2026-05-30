@@ -1,15 +1,27 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 
+import '../controllers/dashboard_controller.dart';
 import '../widgets/dashboard_banner.dart';
 import '../widgets/dashboard_header.dart';
 import '../widgets/work_hours_card.dart';
-import '../widgets/approval_center.dart';
-import '../widgets/apply_requests.dart';
-import '../widgets/reports_documents.dart';
 
-class DashboardScreen extends StatelessWidget {
+class DashboardScreen extends StatefulWidget {
   const DashboardScreen({super.key});
+
+  @override
+  State<DashboardScreen> createState() => _DashboardScreenState();
+}
+
+class _DashboardScreenState extends State<DashboardScreen> {
+
+  @override
+  void initState() {
+    super.initState();
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      DashboardController.loadInitialData(context);
+    });
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -28,16 +40,8 @@ class DashboardScreen extends StatelessWidget {
 
               SizedBox(height: 16.h),
 
-              WorkHoursCard(
-                location: "Thrissur, Kerala, India",
-                workedHours: "05:53",
-                remainingHours: "02:31",
-                checkInTime: "09:23 AM",
-                overtime: "00:00 HRS",
-                completedPercentage: 70,
-                isWorking: true,
-              ),
-              //
+              WorkHoursCard(),
+
               // SizedBox(height: 16.h),
               //
               // const ApprovalCenter(),

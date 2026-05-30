@@ -1,76 +1,191 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
+import 'package:provider/provider.dart';
 
 import '../../../../constants/app_colors.dart';
 import '../../../../constants/app_styles.dart';
+import '../providers/employee_working_duration_viewModel.dart';
+import '../providers/location_viewModel.dart';
+import '../providers/puncing_viewModel.dart';
+
 
 class WorkHoursCard extends StatelessWidget {
-  final String location;
-  final String workedHours;
-  final String remainingHours;
-  final String checkInTime;
-  final String overtime;
-  final int completedPercentage;
-  final bool isWorking;
+  const WorkHoursCard({super.key});
 
-  const WorkHoursCard({
-    super.key,
-    required this.location,
-    required this.workedHours,
-    required this.remainingHours,
-    required this.checkInTime,
-    required this.overtime,
-    required this.completedPercentage,
-    this.isWorking = true,
-  });
+  String _formatDuration(Duration duration) {
+    final h = duration.inHours;
+    final m = duration.inMinutes.remainder(60);
+
+    return '${h}h ${m}m';
+  }
 
   @override
   Widget build(BuildContext context) {
+
+    final workVm = context.watch<EmployeeWorkingDurationViewModel>();
+    final punchVm = context.watch<PunchingProvider>();
+    final locationVm = context.watch<LocationProvider>();
+
+
+    final workedDuration = workVm.workedDuration;
+
+    const targetHours = 9;
+    final targetDuration = Duration(hours: targetHours);
+
+    final remainingDuration = workedDuration >= targetDuration
+        ? Duration.zero
+        : targetDuration - workedDuration;
+
+    final completedPercentage =
+    (workVm.progress(maxHours: targetHours) * 100)
+        .clamp(0, 100)
+        .toInt();
+
+    final statusText = workVm.statusText(maxHours: targetHours);
+    String checkInTime = '--';
+
+    if (punchVm.todayPunches.isNotEmpty) {
+      final time = punchVm.todayPunches.first.time;
+
+      final parts = time.split(':');
+
+      if (parts.length >= 2) {
+        final minutePart = parts[1].split(' ').first;
+
+        final amPm = time.contains('AM')
+            ? 'AM'
+            : time.contains('PM')
+            ? 'PM'
+            : '';
+
+        checkInTime =
+            '${parts[0]}:$minutePart $amPm'.trim();
+      }
+    }
+
+    Duration overtime = Duration.zero;
+
+    if (workedDuration > targetDuration) {
+      overtime = workedDuration - targetDuration;
+    }
+
+    Color badgeColor;
+    Color badgeBgColor;
+    IconData badgeIcon;
+
+    switch (statusText.toLowerCase()) {
+      case 'overtime':
+        badgeColor = Colors.orange;
+        badgeBgColor = Colors.orange.withOpacity(.1);
+        badgeIcon = Icons.local_fire_department;
+        break;
+
+      case 'target achieved':
+        badgeColor = AppColors.success;
+        badgeBgColor = AppColors.success.withOpacity(.1);
+        badgeIcon = Icons.check_circle;
+        break;
+
+      case 'in progress':
+        badgeColor = AppColors.primaryColor;
+        badgeBgColor = AppColors.primaryColor.withOpacity(.1);
+        badgeIcon = Icons.hourglass_bottom;
+        break;
+
+      default:
+        badgeColor = AppColors.warning;
+        badgeBgColor = AppColors.warning.withOpacity(.1);
+        badgeIcon = Icons.access_time;
+    }
+
     return Container(
-      // margin: EdgeInsets.fromLTRB(
-      //   16.w,
-      //   0,
-      //   16.w,
-      //   16.h,
-      // ),
       padding: EdgeInsets.all(16.w),
       decoration: BoxDecoration(
-        color: Colors.white,
+        color: AppColors.white,
         borderRadius: BorderRadius.circular(20.r),
+        boxShadow: [
+          BoxShadow(
+            color: Colors.black.withOpacity(.05),
+            blurRadius: 10,
+            offset: const Offset(0, 4),
+          ),
+        ],
       ),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          /// Header
+          /// HEADER
           Row(
+            crossAxisAlignment: CrossAxisAlignment.start,
             mainAxisAlignment: MainAxisAlignment.spaceBetween,
             children: [
-              Text(
-                "Today Work Hours",
-                style: AppStyles.heading4,
+              Flexible(
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    Text(
+                      "Today Work Hours",
+                      style: AppStyles.heading4,
+                    ),
+
+                    SizedBox(height: 4.h),
+
+                    Row(
+                      mainAxisSize: MainAxisSize.min,
+                      children: [
+                        Icon(
+                          Icons.location_on,
+                          size: 14.sp,
+                          color: AppColors.primaryColor,
+                        ),
+
+                        SizedBox(width: 4.w),
+
+                        Flexible(
+                          child: Text(
+                            locationVm.isLoading
+                                ? "Fetching location..."
+                                : locationVm.locationName,
+                            maxLines: 1,
+                            overflow: TextOverflow.ellipsis,
+                            style: AppStyles.bodySmall.copyWith(
+                              color: AppColors.primaryColor,
+                            ),
+                          ),
+                        ),
+                      ],
+                    ),
+                  ],
+                ),
               ),
+
+              SizedBox(width: 8.w),
+
               Container(
                 padding: EdgeInsets.symmetric(
-                  horizontal: 10.w,
+                  horizontal: 12.w,
                   vertical: 6.h,
                 ),
                 decoration: BoxDecoration(
-                  color: const Color(0xffEDF3FF),
-                  borderRadius: BorderRadius.circular(8.r),
+                  color: badgeBgColor,
+                  borderRadius: BorderRadius.circular(30.r),
                 ),
                 child: Row(
+                  mainAxisSize: MainAxisSize.min,
                   children: [
                     Icon(
-                      Icons.hourglass_bottom,
+                      badgeIcon,
                       size: 14.sp,
-                      color: AppColors.primaryColor,
+                      color: badgeColor,
                     ),
-                    SizedBox(width: 4.w),
+
+                    SizedBox(width: 5.w),
+
                     Text(
-                      isWorking ? "In Progress" : "Completed",
-                      style: TextStyle(
-                        fontSize: 11.sp,
-                        color: AppColors.textColor,
+                      statusText,
+                      style: AppStyles.bodySmall.copyWith(
+                        color: badgeColor,
+                        fontWeight: FontWeight.w600,
                       ),
                     ),
                   ],
@@ -79,69 +194,45 @@ class WorkHoursCard extends StatelessWidget {
             ],
           ),
 
-          SizedBox(height: 10.h),
+          SizedBox(height: 18.h),
 
-          /// Location
+          /// WORKED / COMPLETED / REMAINING
           Row(
+            mainAxisAlignment: MainAxisAlignment.spaceBetween,
             children: [
-              Icon(
-                Icons.location_on_outlined,
-                color: AppColors.primaryColor,
-                size: 18.sp,
+              _statItem(
+                icon: Icons.access_time_filled,
+                title: "Worked",
+                value: _formatDuration(workedDuration),
               ),
-              SizedBox(width: 4.w),
-              Expanded(
-                child: Text(
-                  location,
-                  style: TextStyle(
-                    color: AppColors.primaryColor,
-                    fontSize: 13.sp,
+
+              Column(
+                children: [
+                  Text(
+                    '$completedPercentage%',
+                    style: AppStyles.heading2.copyWith(
+                      color: AppColors.primaryColor,
+                      fontWeight: FontWeight.w700,
+                    ),
                   ),
-                ),
+                  Text(
+                    "Completed",
+                    style: AppStyles.bodySmall,
+                  ),
+                ],
+              ),
+
+              _statItem(
+                icon: Icons.timer_outlined,
+                title: "Remaining",
+                value: _formatDuration(remainingDuration),
               ),
             ],
           ),
 
           SizedBox(height: 18.h),
 
-          /// Stats
-          Row(
-            mainAxisAlignment: MainAxisAlignment.spaceBetween,
-            children: [
-              _statItem(
-                icon: Icons.access_time,
-                title: "Worked",
-                value: workedHours,
-              ),
-              Column(
-                children: [
-                  Text(
-                    "$completedPercentage%",
-                    style: TextStyle(
-                      fontSize: 30.sp,
-                      fontWeight: FontWeight.bold,
-                      color: AppColors.primaryColor,
-                    ),
-                  ),
-                  Text(
-                    "Completed",
-                    style: TextStyle(
-                      fontSize: 12.sp,
-                    ),
-                  ),
-                ],
-              ),
-              _statItem(
-                icon: Icons.access_time,
-                title: "Remaining",
-                value: remainingHours,
-              ),
-            ],
-          ),
-
-          SizedBox(height: 16.h),
-
-          /// Progress
+          /// PROGRESS BAR
           ClipRRect(
             borderRadius: BorderRadius.circular(20.r),
             child: LinearProgressIndicator(
@@ -154,28 +245,28 @@ class WorkHoursCard extends StatelessWidget {
             ),
           ),
 
-          SizedBox(height: 18.h),
+          SizedBox(height: 20.h),
 
-          /// Bottom Cards
+          /// BOTTOM CARDS
           Row(
             children: [
               Expanded(
                 child: _bottomCard(
                   backgroundColor: const Color(0xffEFF8F0),
                   icon: Icons.fingerprint,
-                  iconColor: Colors.green,
+                  iconColor: AppColors.success,
                   title: "Check-In",
                   value: checkInTime,
                 ),
               ),
-              SizedBox(width: 10.w),
+              SizedBox(width: 12.w),
               Expanded(
                 child: _bottomCard(
                   backgroundColor: const Color(0xffEEF4FB),
                   icon: Icons.av_timer,
-                  iconColor: Colors.blueGrey,
+                  iconColor: AppColors.primaryColor,
                   title: "Overtime",
-                  value: overtime,
+                  value: _formatDuration(overtime),
                 ),
               ),
             ],
@@ -194,23 +285,19 @@ class WorkHoursCard extends StatelessWidget {
       children: [
         Icon(
           icon,
-          size: 18.sp,
-          color: Colors.grey,
+          size: 20.sp,
+          color: AppColors.primaryColor,
         ),
-        SizedBox(height: 4.h),
+        SizedBox(height: 6.h),
         Text(
           title,
-          style: TextStyle(
-            fontSize: 12.sp,
-            color: Colors.grey,
-          ),
+          style: AppStyles.bodySmall,
         ),
         SizedBox(height: 2.h),
         Text(
           value,
-          style: TextStyle(
-            fontSize: 20.sp,
-            fontWeight: FontWeight.w600,
+          style: AppStyles.heading4.copyWith(
+            fontWeight: FontWeight.w700,
           ),
         ),
       ],
@@ -226,8 +313,8 @@ class WorkHoursCard extends StatelessWidget {
   }) {
     return Container(
       padding: EdgeInsets.symmetric(
-        vertical: 14.h,
         horizontal: 12.w,
+        vertical: 14.h,
       ),
       decoration: BoxDecoration(
         color: backgroundColor,
@@ -247,16 +334,12 @@ class WorkHoursCard extends StatelessWidget {
               children: [
                 Text(
                   title,
-                  style: TextStyle(
-                    fontSize: 12.sp,
-                    color: Colors.grey.shade700,
-                  ),
+                  style: AppStyles.bodySmall,
                 ),
                 SizedBox(height: 2.h),
                 Text(
                   value,
-                  style: TextStyle(
-                    fontSize: 18.sp,
+                  style: AppStyles.heading4.copyWith(
                     fontWeight: FontWeight.w700,
                   ),
                 ),

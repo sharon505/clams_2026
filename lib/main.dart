@@ -14,6 +14,7 @@ import 'features/Authentication/screens/login_screen.dart';
 import 'features/Authentication/screens/splash_screen.dart';
 import 'features/dashboard/providers/dateTime_viewModel.dart';
 import 'features/dashboard/providers/employee_working_duration_viewModel.dart';
+import 'features/dashboard/providers/location_viewModel.dart';
 import 'features/dashboard/providers/puncing_viewModel.dart';
 import 'features/dashboard/screens/dashboard_screen.dart';
 
@@ -46,6 +47,7 @@ List<SingleChildWidget> providers = [
   ChangeNotifierProvider(create: (_) => DateTimeViewModel()),
   ChangeNotifierProvider(create: (_) => EmployeeWorkingDurationViewModel()),
   ChangeNotifierProvider(create: (_) => PunchingProvider()),
+  ChangeNotifierProvider(create: (_) => LocationProvider()),
 ];
 
 Map<String, Widget Function(BuildContext)> routes = <String, WidgetBuilder>{
