@@ -37,6 +37,12 @@ class AuthProvider with ChangeNotifier {
         : null;
   }
 
+  String? get companyName {
+    return _loginData?.company.isNotEmpty == true
+        ? _loginData!.company.first.companyName
+        : null;
+  }
+
   bool get isManager {
     return _loginData?.data.first.isReportingManager == true;
   }

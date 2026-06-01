@@ -28,5 +28,13 @@ class AppStrings {
   static const String smarterWorkforce = "Smarter\nWorkforce";
   ///DashboardScreen------------------------------------------------------------
   static const String dashboard = "Dashboard";
+  static const String checkIn = 'Check-In';
+  static const String overtime = 'Overtime';
+
+  static const String worked = 'Worked';
+  static const String remaining = 'Remaining';
+  static const String completed = 'Completed';
+
+  static const String todayWorkHours = 'Today Work Hours';
 
 }

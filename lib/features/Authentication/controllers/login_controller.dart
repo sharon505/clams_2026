@@ -8,10 +8,13 @@ import '../providers/auth_provider.dart';
 
 class LoginController {
   final employeeController = TextEditingController(
-    text: '100092'
+    //text: '100092'
+    text: '100002'
   );
+
   final passwordController = TextEditingController(
-      text: '100092#123'
+    //text: '100092#123'
+    text: '123456'
   );
 
   final formKey = GlobalKey<FormState>();

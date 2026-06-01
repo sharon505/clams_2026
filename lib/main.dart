@@ -1,5 +1,15 @@
 import 'dart:io';
 
+import 'package:clams/constants/app_styles.dart';
+import 'package:clams/features/dashboard/screens/dashboard_screen.dart';
+import 'package:clams/features/leaves/providers/LeaveFilter_viewModel.dart';
+import 'package:clams/features/leaves/providers/leaveApply_viewModel.dart';
+import 'package:clams/features/leaves/providers/leaveCancel_viewModel.dart';
+import 'package:clams/features/leaves/providers/leaveSummary_viewModel.dart';
+import 'package:clams/features/work_hours/providers/dateTime_viewModel.dart';
+import 'package:clams/features/work_hours/providers/employee_working_duration_viewModel.dart';
+import 'package:clams/features/work_hours/providers/location_viewModel.dart';
+import 'package:clams/features/work_hours/providers/puncing_viewModel.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_phoenix/flutter_phoenix.dart';
@@ -8,15 +18,12 @@ import 'package:provider/provider.dart';
 import 'package:provider/single_child_widget.dart';
 
 import 'constants/app_colors.dart';
+
 import 'features/Authentication/providers/Image_upload_provider.dart';
 import 'features/Authentication/providers/auth_provider.dart';
 import 'features/Authentication/screens/login_screen.dart';
 import 'features/Authentication/screens/splash_screen.dart';
-import 'features/dashboard/providers/dateTime_viewModel.dart';
-import 'features/dashboard/providers/employee_working_duration_viewModel.dart';
-import 'features/dashboard/providers/location_viewModel.dart';
-import 'features/dashboard/providers/puncing_viewModel.dart';
-import 'features/dashboard/screens/dashboard_screen.dart';
+import 'features/leaves/screens/apply_leave.dart';
 
 final RouteObserver<ModalRoute<void>> routeObserver =
 RouteObserver<ModalRoute<void>>();
@@ -48,6 +55,11 @@ List<SingleChildWidget> providers = [
   ChangeNotifierProvider(create: (_) => EmployeeWorkingDurationViewModel()),
   ChangeNotifierProvider(create: (_) => PunchingProvider()),
   ChangeNotifierProvider(create: (_) => LocationProvider()),
+  ///Leaves---------------------------------------------------------------------
+  ChangeNotifierProvider(create: (_) => LeaveApplyProvider()),
+  ChangeNotifierProvider(create: (_) => LeaveCancelProvider()),
+  ChangeNotifierProvider(create: (_) => LeaveFilterProvider()),
+  ChangeNotifierProvider(create: (_) => LeaveSummaryProvider()),
 ];
 
 Map<String, Widget Function(BuildContext)> routes = <String, WidgetBuilder>{
@@ -56,6 +68,8 @@ Map<String, Widget Function(BuildContext)> routes = <String, WidgetBuilder>{
   'loginPage':             (context) => LoginPage(),
   ///DashboardScreen------------------------------------------------------------
   'dashboardScreen':       (context) => DashboardScreen(),
+  ///Leaves---------------------------------------------------------------------
+  'ApplyLeave':       (context) => ApplyLeave(),
 };
 
 class MyApp extends StatelessWidget {
@@ -92,6 +106,18 @@ class MyApp extends StatelessWidget {
                 primaryColor: AppColors.primaryColor,
                 colorScheme: ColorScheme.fromSeed(
                   seedColor: AppColors.primaryColor,
+                ),
+                appBarTheme: AppBarTheme(
+                  backgroundColor: AppColors.primaryBg,
+                  elevation: 0,
+                  centerTitle: false,
+                  scrolledUnderElevation: 0,
+                  iconTheme: const IconThemeData(
+                    color: AppColors.textColor,
+                  ),
+                  titleTextStyle: AppStyles.heading3.copyWith(
+                    color: AppColors.textColor,
+                  ),
                 ),
               ),
           ),
