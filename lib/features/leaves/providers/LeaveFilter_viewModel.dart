@@ -75,4 +75,12 @@ class LeaveFilterProvider with ChangeNotifier {
     _sort = value;
     notifyListeners();
   }
+
+  void reset() {
+    _filter = LeaveFilter.all;
+    _dateRange = null;
+    _leaveTypeFilter = null;
+    _sort = LeaveSort.none;
+    notifyListeners();
+  }
 }

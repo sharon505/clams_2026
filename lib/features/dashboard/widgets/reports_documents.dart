@@ -4,7 +4,6 @@ import 'package:clams/constants/app_styles.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 
-
 class ReportsDocumentsCard extends StatelessWidget {
   const ReportsDocumentsCard({super.key});
 
@@ -20,22 +19,20 @@ class ReportsDocumentsCard extends StatelessWidget {
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          Text(
-            'Reports & Documents',
-            style: AppStyles.heading4,
-          ),
+          Text('Reports & Documents', style: AppStyles.heading4),
 
           SizedBox(height: 20.h),
 
           Wrap(
             spacing: 22.w,
             runSpacing: 20.h,
-            children: const [
+            children: [
               ReportDocumentItem(
                 title: 'Leave\nReport',
                 icon: Icons.beach_access,
                 backgroundColor: Color(0xFFE8F5E9),
                 iconColor: Colors.green,
+                onTap: () => Navigator.pushNamed(context, 'LeavesView'),
               ),
               ReportDocumentItem(
                 title: 'Movement\nReport',
@@ -81,7 +78,6 @@ class ReportsDocumentsCard extends StatelessWidget {
   }
 }
 
-
 class ReportDocumentItem extends StatelessWidget {
   final String title;
   final IconData icon;
@@ -114,11 +110,7 @@ class ReportDocumentItem extends StatelessWidget {
                 color: backgroundColor,
                 shape: BoxShape.circle,
               ),
-              child: Icon(
-                icon,
-                color: iconColor,
-                size: 26.sp,
-              ),
+              child: Icon(icon, color: iconColor, size: 26.sp),
             ),
             SizedBox(height: 8.h),
             Text(

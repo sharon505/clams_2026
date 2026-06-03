@@ -20,6 +20,7 @@ class LeaveTypeProvider with ChangeNotifier {
   String _selectedDayType = 'Full Day';
   String _selectedLeaveSection = 'Morning';
 
+
   DateTime focusedDay = DateTime.now();
   DateTime? fromDate;
   DateTime? toDate;

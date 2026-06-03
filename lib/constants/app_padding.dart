@@ -27,12 +27,28 @@ class AppPadding {
     vertical: 20.h,
   );
 
+
+
   static EdgeInsets cardPadding =
   EdgeInsets.all(16.r);
 
   static EdgeInsets buttonPadding =
   EdgeInsets.symmetric(
     horizontal: 20.w,
+    vertical: 12.h,
+  );
+
+  static EdgeInsets allSmall = EdgeInsets.all(12.r);
+
+  static EdgeInsets horizontalOnly = EdgeInsets.symmetric(
+    horizontal: 12.w,
+  );
+
+  static EdgeInsets horizontalMedium = EdgeInsets.symmetric(
+    horizontal: 16.w,
+  );
+
+  static EdgeInsets verticalOnly = EdgeInsets.symmetric(
     vertical: 12.h,
   );
 }

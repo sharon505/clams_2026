@@ -6,6 +6,8 @@ import 'package:clams/features/leaves/providers/LeaveFilter_viewModel.dart';
 import 'package:clams/features/leaves/providers/leaveApply_viewModel.dart';
 import 'package:clams/features/leaves/providers/leaveCancel_viewModel.dart';
 import 'package:clams/features/leaves/providers/leaveSummary_viewModel.dart';
+import 'package:clams/features/leaves/providers/leaveType_viewModel.dart';
+import 'package:clams/features/leaves/screens/leaves_view.dart';
 import 'package:clams/features/work_hours/providers/dateTime_viewModel.dart';
 import 'package:clams/features/work_hours/providers/employee_working_duration_viewModel.dart';
 import 'package:clams/features/work_hours/providers/location_viewModel.dart';
@@ -60,6 +62,7 @@ List<SingleChildWidget> providers = [
   ChangeNotifierProvider(create: (_) => LeaveCancelProvider()),
   ChangeNotifierProvider(create: (_) => LeaveFilterProvider()),
   ChangeNotifierProvider(create: (_) => LeaveSummaryProvider()),
+  ChangeNotifierProvider(create: (_) => LeaveTypeProvider()),
 ];
 
 Map<String, Widget Function(BuildContext)> routes = <String, WidgetBuilder>{
@@ -69,7 +72,8 @@ Map<String, Widget Function(BuildContext)> routes = <String, WidgetBuilder>{
   ///DashboardScreen------------------------------------------------------------
   'dashboardScreen':       (context) => DashboardScreen(),
   ///Leaves---------------------------------------------------------------------
-  'ApplyLeave':       (context) => ApplyLeave(),
+  'ApplyLeave':            (context) => ApplyLeave(),
+  'LeavesView':            (context) => LeavesView(),
 };
 
 class MyApp extends StatelessWidget {
