@@ -7,6 +7,7 @@ import 'package:clams/features/leaves/providers/leaveApply_viewModel.dart';
 import 'package:clams/features/leaves/providers/leaveCancel_viewModel.dart';
 import 'package:clams/features/leaves/providers/leaveSummary_viewModel.dart';
 import 'package:clams/features/leaves/providers/leaveType_viewModel.dart';
+import 'package:clams/features/leaves/screens/leave_details_screen.dart';
 import 'package:clams/features/leaves/screens/leaves_view.dart';
 import 'package:clams/features/work_hours/providers/dateTime_viewModel.dart';
 import 'package:clams/features/work_hours/providers/employee_working_duration_viewModel.dart';
@@ -74,6 +75,7 @@ Map<String, Widget Function(BuildContext)> routes = <String, WidgetBuilder>{
   ///Leaves---------------------------------------------------------------------
   'ApplyLeave':            (context) => ApplyLeave(),
   'LeavesView':            (context) => LeavesView(),
+  'LeaveDetailsScreen':    (context) => const LeaveDetailsScreen(),
 };
 
 class MyApp extends StatelessWidget {
