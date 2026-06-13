@@ -1,5 +1,4 @@
 import 'package:clams/constants/app_colors.dart';
-import 'package:clams/constants/app_radius.dart';
 import 'package:clams/features/leaves/providers/LeaveFilter_viewModel.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
@@ -29,7 +28,7 @@ class LeaveFilterBar extends StatelessWidget {
     _Segment(filter: LeaveFilter.cancelled, label: 'Cancelled'),
   ];
 
-  Future<void> _pickDateRange(BuildContext context) async {
+  Future<void> pickDateRange(BuildContext context) async {
     final now = DateTime.now();
 
     final picked = await showDateRangePicker(
@@ -55,20 +54,14 @@ class LeaveFilterBar extends StatelessWidget {
       children: [
         /// STATUS FILTER
         Container(
-          padding: EdgeInsets.all(4.w),
+          padding: EdgeInsets.all(3.w),
           decoration: BoxDecoration(
             color: AppColors.white,
-            borderRadius: AppRadius.large,
+            borderRadius: BorderRadius.circular(11.r),
             border: Border.all(
               color: AppColors.primarySecondary,
+              width: 1,
             ),
-            boxShadow: [
-              BoxShadow(
-                color: Colors.black.withOpacity(.05),
-                blurRadius: 12,
-                offset: const Offset(0, 4),
-              ),
-            ],
           ),
           child: Row(
             children: _segments.map((segment) {
@@ -77,123 +70,61 @@ class LeaveFilterBar extends StatelessWidget {
               return Expanded(
                 child: GestureDetector(
                   onTap: () => onChanged(segment.filter),
-                  child: AnimatedContainer(
-                    duration: const Duration(milliseconds: 250),
-                    curve: Curves.easeInOut,
-                    padding: EdgeInsets.symmetric(
-                      vertical: 12.h,
+                  child: TweenAnimationBuilder<double>(
+                    tween: Tween(
+                      begin: isSelected ? 0.98 : 1,
+                      end: isSelected ? 1 : 0.98,
                     ),
-                    decoration: BoxDecoration(
-                      color: isSelected
-                          ? AppColors.primaryColor
-                          : Colors.transparent,
-                      borderRadius: AppRadius.medium,
-                    ),
-                    child: Center(
-                      child: Text(
-                        segment.label,
-                        textAlign: TextAlign.center,
-                        style: TextStyle(
-                          fontSize: 11.sp,
-                          fontWeight: FontWeight.w600,
-                          color: isSelected
-                              ? AppColors.white
-                              : AppColors.textColor,
+                    duration: const Duration(milliseconds: 300),
+                    curve: Curves.easeOutCubic,
+                    builder: (context, scale, child) {
+                      return Transform.scale(
+                        scale: scale,
+                        child: AnimatedContainer(
+                          duration: const Duration(milliseconds: 300),
+                          curve: Curves.easeOutCubic,
+                          height: 42.h,
+                          alignment: Alignment.center,
+                          margin: EdgeInsets.symmetric(horizontal: 2.w),
+                          decoration: BoxDecoration(
+                            color: isSelected
+                                ? AppColors.primaryColor
+                                : Colors.transparent,
+                            borderRadius: BorderRadius.circular(11.r),
+                            boxShadow: isSelected
+                                ? [
+                              BoxShadow(
+                                color: AppColors.primaryColor.withOpacity(.25),
+                                blurRadius: 8,
+                                offset: const Offset(0, 3),
+                              ),
+                            ]
+                                : [],
+                          ),
+                          child: AnimatedDefaultTextStyle(
+                            duration: const Duration(milliseconds: 250),
+                            curve: Curves.easeOut,
+                            style: TextStyle(
+                              fontSize: isSelected ? 13.5.sp : 13.sp,
+                              fontWeight: FontWeight.w600,
+                              color: isSelected
+                                  ? Colors.white
+                                  : AppColors.textColor,
+                            ),
+                            child: Text(
+                              segment.label,
+                              maxLines: 1,
+                              overflow: TextOverflow.ellipsis,
+                            ),
+                          ),
                         ),
-                      ),
-                    ),
+                      );
+                    },
                   ),
                 ),
               );
             }).toList(),
           ),
-        ),
-
-        SizedBox(height: 12.h),
-
-        /// DATE + FILTER BUTTON
-        Row(
-          children: [
-            Expanded(
-              child: InkWell(
-                borderRadius: AppRadius.large,
-                onTap: () => _pickDateRange(context),
-                child: Container(
-                  padding: EdgeInsets.symmetric(
-                    horizontal: 16.w,
-                    vertical: 14.h,
-                  ),
-                  decoration: BoxDecoration(
-                    color: selectedRange != null
-                        ? AppColors.primarySecondary
-                        : AppColors.white,
-                    borderRadius: AppRadius.large,
-                    border: Border.all(
-                      color: AppColors.primarySecondary,
-                    ),
-                    boxShadow: [
-                      BoxShadow(
-                        color: Colors.black.withOpacity(.04),
-                        blurRadius: 8,
-                        offset: const Offset(0, 2),
-                      ),
-                    ],
-                  ),
-                  child: Row(
-                    children: [
-                      Icon(
-                        Icons.calendar_month_rounded,
-                        color: AppColors.primaryColor,
-                        size: 18.sp,
-                      ),
-                      SizedBox(width: 8.w),
-                      Expanded(
-                        child: Text(
-                          selectedRange != null
-                              ? "${selectedRange!.start.day}/${selectedRange!.start.month} - ${selectedRange!.end.day}/${selectedRange!.end.month}"
-                              : "Select Date Range",
-                          overflow: TextOverflow.ellipsis,
-                          style: TextStyle(
-                            fontSize: 12.sp,
-                            fontWeight: FontWeight.w600,
-                            color: AppColors.textColor,
-                          ),
-                        ),
-                      ),
-                    ],
-                  ),
-                ),
-              ),
-            ),
-
-            SizedBox(width: 10.w),
-
-            /// FILTER BUTTON
-            InkWell(
-              borderRadius: AppRadius.large,
-              onTap: onSortPressed,
-              child: Container(
-                height: 50.h,
-                width: 50.h,
-                decoration: BoxDecoration(
-                  color: AppColors.primaryColor,
-                  borderRadius: AppRadius.large,
-                  boxShadow: [
-                    BoxShadow(
-                      color: AppColors.primaryColor.withOpacity(.25),
-                      blurRadius: 10,
-                      offset: const Offset(0, 4),
-                    ),
-                  ],
-                ),
-                child: Icon(
-                  Icons.tune_rounded,
-                  color: AppColors.white,
-                  size: 22.sp,
-                ),
-              ),
-            ),
-          ],
         ),
       ],
     );

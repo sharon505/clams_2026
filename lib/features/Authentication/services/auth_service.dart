@@ -30,6 +30,7 @@ class AuthService {
           'Employeecode': userModel.usercode,
           'Password': userModel.password,
           'Company': AppUrls.companyName,
+          'Version': AppUrls.version
         },
       );
 

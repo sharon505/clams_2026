@@ -4,6 +4,7 @@ import 'package:clams/features/leaves/models/model_leaveSummery.dart';
 import 'package:clams/features/leaves/providers/LeaveFilter_viewModel.dart';
 import 'package:clams/features/leaves/providers/leaveCancel_viewModel.dart';
 import 'package:clams/features/leaves/providers/leaveSummary_viewModel.dart';
+import 'package:clams/features/leaves/widgets/leave_summary_card.dart';
 import 'package:clams/features/leaves/widgets/show_leave_record_dialog.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
@@ -182,15 +183,38 @@ Widget leaveSummeryWidget({
             final item = list[index];
             final canCancel = item.status.toLowerCase() == 'pending';
 
-            return _summaryCard(
-              applyDate: item.appliedDate,
-              fromDate: item.fromDate,
-              toDate: item.toDate,
+            return LeaveSummaryCard(
               leaveType: item.leaveType,
               status: item.status,
-              deleteDisabled: cancelP.isCancelling || !canCancel,
-              onTapDelete: () => _onDelete(context, cancelP, summaryP, item),
-              onTap: () => showLeaveRecordDialog(context: context, data: item),
+
+              appliedDate: _format(item.appliedDate),
+
+              statusDate: item.updatedDate != null &&
+                  item.updatedDate!.isNotEmpty
+                  ? _format(item.updatedDate)
+                  : "-",
+
+              approvedBy: item.appliedTo,
+
+              days: item.noOfDays == 1
+                  ? "1 Day"
+                  : "${item.noOfDays.toStringAsFixed(0)} Days",
+
+              showDelete: canCancel,
+
+              deleting: cancelP.isCancelling,
+
+              onDelete: () => _onDelete(
+                context,
+                cancelP,
+                summaryP,
+                item,
+              ),
+
+              onTap: () => showLeaveRecordDialog(
+                context: context,
+                data: item,
+              ),
             );
           }),
 
@@ -241,220 +265,6 @@ Future<void> _onDelete(
 ///////////////////////////////////////////////////////////////////////////////
 /// SUMMARY CARD
 ///////////////////////////////////////////////////////////////////////////////
-Widget _summaryCard({
-  required String? applyDate,
-  required String? fromDate,
-  required String? toDate,
-  required String? leaveType,
-  required String? status,
-  required VoidCallback? onTap,
-  required VoidCallback? onTapDelete,
-  bool deleteDisabled = false,
-  bool isDeleting = false,
-}) {
-  final s = (status ?? 'pending').toLowerCase();
-
-  Color statusColor;
-
-  switch (s) {
-    case "approved":
-      statusColor = Colors.green;
-      break;
-    case "cancelled":
-    case "rejected":
-      statusColor = Colors.red;
-      break;
-    default:
-      statusColor = Colors.orange;
-  }
-
-  return Container(
-    margin: EdgeInsets.symmetric(
-      horizontal: 16.w,
-      vertical: 8.h,
-    ),
-    decoration: BoxDecoration(
-      color: Colors.white,
-      borderRadius: BorderRadius.circular(20.r),
-      boxShadow: [
-        BoxShadow(
-          color: Colors.black.withOpacity(.05),
-          blurRadius: 20,
-          offset: const Offset(0, 8),
-        ),
-      ],
-    ),
-    child: Row(
-      children: [
-        /// STATUS STRIP
-        Container(
-          width: 6.w,
-          height: 145.h,
-          decoration: BoxDecoration(
-            color: statusColor,
-            borderRadius: BorderRadius.only(
-              topLeft: Radius.circular(20.r),
-              bottomLeft: Radius.circular(20.r),
-            ),
-          ),
-        ),
-
-        Expanded(
-          child: Padding(
-            padding: EdgeInsets.all(16.w),
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                /// HEADER
-                Row(
-                  children: [
-                    CircleAvatar(
-                      radius: 20.r,
-                      backgroundColor:
-                      statusColor.withOpacity(.12),
-                      child: Icon(
-                        Icons.event_note_rounded,
-                        color: statusColor,
-                        size: 20.sp,
-                      ),
-                    ),
-
-                    SizedBox(width: 12.w),
-
-                    Expanded(
-                      child: Column(
-                        crossAxisAlignment:
-                        CrossAxisAlignment.start,
-                        children: [
-                          Text(
-                            leaveType ?? "Leave",
-                            style:
-                            AppStyles.heading1.copyWith(
-                              fontSize: 15.sp,
-                              fontWeight:
-                              FontWeight.bold,
-                            ),
-                          ),
-
-                          SizedBox(height: 2.h),
-
-                          Text(
-                            "Applied ${_format(applyDate)}",
-                            style:
-                            AppStyles.heading4,
-                          ),
-                        ],
-                      ),
-                    ),
-
-                    _statusPill(s),
-                  ],
-                ),
-
-                SizedBox(height: 16.h),
-
-                /// DATE RANGE
-                Container(
-                  padding: EdgeInsets.all(14.w),
-                  decoration: BoxDecoration(
-                    color: AppColors.primaryColor
-                        .withOpacity(.08),
-                    borderRadius:
-                    BorderRadius.circular(16.r),
-                  ),
-                  child: Row(
-                    children: [
-                      Icon(
-                        Icons.calendar_month,
-                        color: AppColors.primaryColor,
-                        size: 20.sp,
-                      ),
-
-                      SizedBox(width: 10.w),
-
-                      Expanded(
-                        child: Column(
-                          crossAxisAlignment:
-                          CrossAxisAlignment.start,
-                          children: [
-                            Text(
-                              "Leave Period",
-                              style: TextStyle(
-                                color: Colors.grey,
-                                fontSize: 11.sp,
-                              ),
-                            ),
-                            SizedBox(height: 2.h),
-                            Text(
-                              "${_format(fromDate)}  →  ${_format(toDate)}",
-                              style: TextStyle(
-                                fontWeight:
-                                FontWeight.w600,
-                                fontSize: 13.sp,
-                              ),
-                            ),
-                          ],
-                        ),
-                      ),
-                    ],
-                  ),
-                ),
-
-                SizedBox(height: 16.h),
-
-                /// ACTIONS
-                Row(
-                  mainAxisAlignment:
-                  MainAxisAlignment.end,
-                  children: [
-                    if (s == "pending")
-                      Container(
-                        decoration: BoxDecoration(
-                          color: Colors.red
-                              .withOpacity(.08),
-                          borderRadius:
-                          BorderRadius.circular(
-                              12.r),
-                        ),
-                        child: _deleteIcon(
-                          disabled: deleteDisabled,
-                          loading: isDeleting,
-                          onTap: onTapDelete,
-                        ),
-                      ),
-
-                    SizedBox(width: 10.w),
-
-                    InkWell(
-                      onTap: onTap,
-                      borderRadius:
-                      BorderRadius.circular(12.r),
-                      child: Container(
-                        padding:
-                        EdgeInsets.all(10.w),
-                        decoration: BoxDecoration(
-                          color: AppColors.primaryColor,
-                          borderRadius:
-                          BorderRadius.circular(
-                              12.r),
-                        ),
-                        child: Icon(
-                          Icons.arrow_forward_ios,
-                          color: Colors.white,
-                          size: 16.sp,
-                        ),
-                      ),
-                    ),
-                  ],
-                ),
-              ],
-            ),
-          ),
-        ),
-      ],
-    ),
-  );
-}
 
 ///////////////////////////////////////////////////////////////////////////////
 /// HELPERS

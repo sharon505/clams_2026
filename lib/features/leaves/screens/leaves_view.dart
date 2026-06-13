@@ -17,13 +17,11 @@ class LeavesView extends StatefulWidget {
 }
 
 class _LeavesViewState extends State<LeavesView> {
-
   @override
   void initState() {
     super.initState();
 
     WidgetsBinding.instance.addPostFrameCallback((_) async {
-
       /// Reset Filters
       context.read<LeaveFilterProvider>().reset();
 
@@ -31,9 +29,7 @@ class _LeavesViewState extends State<LeavesView> {
       context.read<LeaveSummaryProvider>().reset();
 
       /// Load Fresh Data
-      await context
-          .read<LeaveSummaryProvider>()
-          .load(context: context);
+      await context.read<LeaveSummaryProvider>().load(context: context);
     });
   }
 
@@ -41,39 +37,62 @@ class _LeavesViewState extends State<LeavesView> {
   Widget build(BuildContext context) {
     final provider = context.watch<LeaveFilterProvider>();
     final filter = provider.filter;
+    final filterProvider = context.watch<LeaveFilterProvider>();
 
     return Scaffold(
       backgroundColor: const Color(0xFFF8F9FC),
-
       appBar: AppBar(
         elevation: 0,
-        centerTitle: false,
         backgroundColor: AppColors.primaryBg,
         foregroundColor: Colors.white,
-        title: Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-            Text(
-              "My Leaves",
-              style: TextStyle(
-                fontSize: 18.sp,
-                fontWeight: FontWeight.bold,
-              ),
-            ),
-            Text(
-              "Track and manage leave requests",
-              style: TextStyle(
-                fontSize: 11.sp,
-                fontWeight: FontWeight.w400,
-              ),
-            ),
-          ],
-        ),
-      ),
+        centerTitle: false,
 
+        title: Text(
+          "Leaves",
+          style: TextStyle(fontSize: 18.sp, fontWeight: FontWeight.bold),
+        ),
+
+        actions: [
+          IconButton(
+            tooltip: "Date Filter",
+            onPressed: () async {
+              final now = DateTime.now();
+
+              final picked = await showDateRangePicker(
+                context: context,
+                firstDate: DateTime(now.year - 5),
+                lastDate: DateTime(now.year + 5),
+                initialDateRange:
+                filterProvider.dateRange ??
+                    DateTimeRange(
+                      start: now.subtract(const Duration(days: 7)),
+                      end: now,
+                    ),
+              );
+
+              if (picked != null) {
+                filterProvider.setDateRange(picked);
+              }
+            },
+            icon: const Icon(Icons.calendar_month_outlined),
+          ),
+
+          /// Leave Type
+          IconButton(
+            tooltip: "Leave Type",
+            onPressed: () {
+              _showLeaveTypeFilterSheet(context, filterProvider);
+            },
+            icon: const Icon(Icons.filter_alt_outlined),
+          ),
+
+        ],
+      ),
       body: Column(
         children: [
-          Container(
+          AnimatedContainer(
+            duration: const Duration(milliseconds: 350),
+            curve: Curves.easeOutCubic,
             width: double.infinity,
             decoration: BoxDecoration(
               color: AppColors.primaryBg,
@@ -83,46 +102,54 @@ class _LeavesViewState extends State<LeavesView> {
               ),
             ),
             child: Padding(
-              padding: EdgeInsets.fromLTRB(
-                12.w,
-                0,
-                12.w,
-                18.h,
-              ),
-              child: LeaveFilterBar(
-                // backgroundColor: Colors.white,
-                // selectedColor: AppColors.primaryBg,
-                // textColor: Colors.white,
-                // height: 43.h,
-                value: filter,
-                // padding: EdgeInsets.zero,
-                onChanged: provider.setFilter,
-                onDateSelected: provider.setDateRange,
-                selectedRange: provider.dateRange,
-                onSortPressed: () =>
-                    _showLeaveTypeFilterSheet(
-                      context,
-                      provider,
+              padding: EdgeInsets.fromLTRB(12.w, 0, 12.w, 18.h),
+              child: TweenAnimationBuilder<double>(
+                duration: const Duration(milliseconds: 400),
+                tween: Tween(begin: 0, end: 1),
+                curve: Curves.easeOut,
+                builder: (context, value, child) {
+                  return Opacity(
+                    opacity: value,
+                    child: Transform.translate(
+                      offset: Offset(0, (1 - value) * 20),
+                      child: child,
                     ),
-              ),
+                  );
+                },
+                child: LeaveFilterBar(
+                  value: filter,
+                  onChanged: provider.setFilter,
+                  onDateSelected: provider.setDateRange,
+                  selectedRange: provider.dateRange,
+                  onSortPressed: () =>
+                      _showLeaveTypeFilterSheet(context, provider),
+                ),
+              )
             ),
           ),
 
           SizedBox(height: 10.h),
 
           Expanded(
-            child: RefreshIndicator(
-              onRefresh: () async {},
-              child: SingleChildScrollView(
-                physics:
-                const AlwaysScrollableScrollPhysics(),
-                padding: EdgeInsets.only(
-                  bottom: 20.h,
-                ),
-                child: leaveSummeryWidget(
-                  context: context,
-                  enableEmptyText: true,
-                  disableTitle: true,
+            child: AnimatedSwitcher(
+              duration: const Duration(milliseconds: 300),
+              switchInCurve: Curves.easeOut,
+              switchOutCurve: Curves.easeIn,
+              child: RefreshIndicator(
+                key: ValueKey(filter),
+                onRefresh: () async {
+                  await context.read<LeaveSummaryProvider>().load(
+                    context: context,
+                  );
+                },
+                child: SingleChildScrollView(
+                  physics: const AlwaysScrollableScrollPhysics(),
+                  padding: EdgeInsets.only(bottom: 20.h),
+                  child: leaveSummeryWidget(
+                    context: context,
+                    enableEmptyText: true,
+                    disableTitle: true,
+                  ),
                 ),
               ),
             ),
@@ -134,7 +161,9 @@ class _LeavesViewState extends State<LeavesView> {
 }
 
 void _showLeaveTypeFilterSheet(
-    BuildContext context, LeaveFilterProvider provider) {
+  BuildContext context,
+  LeaveFilterProvider provider,
+) {
   showModalBottomSheet(
     context: context,
     shape: const RoundedRectangleBorder(
@@ -162,7 +191,7 @@ void _showLeaveTypeFilterSheet(
                   final label = options[index];
                   final isSelected =
                       (selected == null && label == 'All Types') ||
-                          (selected != null && selected == label);
+                      (selected != null && selected == label);
 
                   return ListTile(
                     title: Text(label),
@@ -183,4 +212,3 @@ void _showLeaveTypeFilterSheet(
     },
   );
 }
-

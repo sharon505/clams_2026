@@ -2,19 +2,19 @@ class AppUrls {
 
   static const String companyName   = 'all';
 
-  static const String version = "1.0.2 + 3";
+  static const String version = "1.0.11+12";
 
   static const Map<String, String> header = {
     'Content-Type': 'application/x-www-form-urlencoded',
   };
 
   /// Base URL
-  static const String baseUrl =
-      "https://clamsapi.ciinfos.com:56235/CRMSIntegration.asmx";
+  // static const String baseUrl =
+  //     "https://clamsapi.ciinfos.com:56235/CRMSIntegration.asmx";
 
   /// Test URL
-  // static const String baseUrl =
-  //     "https://clamsapiuat.ciinfos.com:25456/CRMSIntegration.asmx/";
+  static const String baseUrl =
+      "https://clamsapiuat.ciinfos.com:25456/CRMSIntegration.asmx/";
 
 
   static Uri _u(String path) =>  Uri.parse('$baseUrl/$path');
