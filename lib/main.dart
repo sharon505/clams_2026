@@ -1,6 +1,8 @@
 import 'dart:io';
 
 import 'package:clams/constants/app_styles.dart';
+import 'package:clams/features/Attendance/providers/punch_log_viewModel.dart';
+import 'package:clams/features/Attendance/views/attendance_calendar_widget.dart';
 import 'package:clams/features/dashboard/screens/dashboard_screen.dart';
 import 'package:clams/features/leaves/providers/LeaveFilter_viewModel.dart';
 import 'package:clams/features/leaves/providers/leaveApply_viewModel.dart';
@@ -64,6 +66,8 @@ List<SingleChildWidget> providers = [
   ChangeNotifierProvider(create: (_) => LeaveFilterProvider()),
   ChangeNotifierProvider(create: (_) => LeaveSummaryProvider()),
   ChangeNotifierProvider(create: (_) => LeaveTypeProvider()),
+  ///attendance-----------------------------------------------------------------
+  ChangeNotifierProvider(create: (_) => PunchLogViewModel()),
 ];
 
 Map<String, Widget Function(BuildContext)> routes = <String, WidgetBuilder>{
@@ -76,6 +80,8 @@ Map<String, Widget Function(BuildContext)> routes = <String, WidgetBuilder>{
   'ApplyLeave':            (context) => ApplyLeave(),
   'LeavesView':            (context) => LeavesView(),
   'LeaveDetailsScreen':    (context) => const LeaveDetailsScreen(),
+  ///attendance-----------------------------------------------------------------
+  'AttendanceCalendar':    (context) => const AttendanceCalendar(),
 };
 
 class MyApp extends StatelessWidget {

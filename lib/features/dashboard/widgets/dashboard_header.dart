@@ -25,17 +25,18 @@ class DashboardHeader extends StatelessWidget {
         CircleAvatar(
           radius: 23.r,
           backgroundColor: Colors.white,
-          backgroundImage:
-          profileImage != null ? MemoryImage(profileImage) : null,
+          backgroundImage: profileImage != null
+              ? MemoryImage(profileImage)
+              : null,
           child: profileImage == null
               ? Padding(
-            padding: EdgeInsets.all(10.r),
-            child: SvgPicture.asset(
-              'assets/icons/dashBord/User.svg',
-              width: 24.w,
-              height: 24.h,
-            ),
-          )
+                  padding: EdgeInsets.all(10.r),
+                  child: SvgPicture.asset(
+                    'assets/icons/dashBord/User.svg',
+                    width: 24.w,
+                    height: 24.h,
+                  ),
+                )
               : null,
         ),
         Expanded(
@@ -62,7 +63,7 @@ class DashboardHeader extends StatelessWidget {
           radius: 22.r,
           backgroundColor: Colors.white,
           child: IconButton(
-            onPressed: () {},
+            onPressed: () => Navigator.pushNamed(context, 'AttendanceCalendar'),
             icon: SvgPicture.asset(
               'assets/icons/dashBord/calendar.svg',
               width: 22.w,
