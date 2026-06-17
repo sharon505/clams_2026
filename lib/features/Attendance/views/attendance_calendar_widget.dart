@@ -7,6 +7,7 @@ import 'package:clams/features/Attendance/models/model_punch_log.dart';
 import 'package:clams/features/Attendance/providers/punch_log_viewModel.dart';
 import 'package:clams/features/Attendance/widgets/attendance_day_cell.dart';
 import 'package:clams/features/Attendance/widgets/attendance_month_details_card.dart';
+import 'package:clams/features/Attendance/widgets/attendance_ot_card.dart';
 import 'package:clams/features/Authentication/providers/auth_provider.dart';
 
 import 'package:flutter/material.dart';
@@ -16,8 +17,6 @@ import 'package:provider/provider.dart';
 import 'package:table_calendar/table_calendar.dart';
 
 import '../widgets/attendance_status_card.dart';
-import '../widgets/attendance_ot_card.dart';
-import '../widgets/attendance_action_card.dart';
 
 class AttendanceCalendar extends StatefulWidget {
   const AttendanceCalendar({super.key});

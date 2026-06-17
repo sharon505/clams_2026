@@ -11,6 +11,9 @@ import 'package:clams/features/leaves/providers/leaveSummary_viewModel.dart';
 import 'package:clams/features/leaves/providers/leaveType_viewModel.dart';
 import 'package:clams/features/leaves/screens/leave_details_screen.dart';
 import 'package:clams/features/leaves/screens/leaves_view.dart';
+import 'package:clams/features/profile/provider/LeaveBalance_viewModel.dart';
+import 'package:clams/features/profile/provider/employee_viewModel.dart';
+import 'package:clams/features/profile/views/profile_view.dart';
 import 'package:clams/features/work_hours/providers/dateTime_viewModel.dart';
 import 'package:clams/features/work_hours/providers/employee_working_duration_viewModel.dart';
 import 'package:clams/features/work_hours/providers/location_viewModel.dart';
@@ -68,6 +71,9 @@ List<SingleChildWidget> providers = [
   ChangeNotifierProvider(create: (_) => LeaveTypeProvider()),
   ///attendance-----------------------------------------------------------------
   ChangeNotifierProvider(create: (_) => PunchLogViewModel()),
+  ///profile--------------------------------------------------------------------
+  ChangeNotifierProvider(create: (_) => EmployeeViewModel()),
+  ChangeNotifierProvider(create: (_) => LeaveBalanceProvider()),
 ];
 
 Map<String, Widget Function(BuildContext)> routes = <String, WidgetBuilder>{
@@ -82,6 +88,8 @@ Map<String, Widget Function(BuildContext)> routes = <String, WidgetBuilder>{
   'LeaveDetailsScreen':    (context) => const LeaveDetailsScreen(),
   ///attendance-----------------------------------------------------------------
   'AttendanceCalendar':    (context) => const AttendanceCalendar(),
+  ///profile--------------------------------------------------------------------
+  'ProfileView':           (context) => const ProfileView(),
 };
 
 class MyApp extends StatelessWidget {

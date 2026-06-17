@@ -19,7 +19,6 @@ class DashboardScreen extends StatefulWidget {
 }
 
 class _DashboardScreenState extends State<DashboardScreen> {
-
   @override
   void initState() {
     super.initState();
@@ -30,7 +29,6 @@ class _DashboardScreenState extends State<DashboardScreen> {
 
   @override
   Widget build(BuildContext context) {
-
     final auth = Provider.of<AuthProvider>(context);
 
     return Scaffold(
@@ -41,14 +39,16 @@ class _DashboardScreenState extends State<DashboardScreen> {
           child: Column(
             spacing: 16.h,
             children: [
-              const DashboardHeader(),
+              DashboardHeader(
+                onTap: () => Navigator.pushNamed(context, 'ProfileView'),
+              ),
 
               const DashboardBanner(),
 
               WorkHoursCard(),
 
-              if(auth.userData?.isReportingManager==true)
-              const ApprovalCenterCard(),
+              if (auth.userData?.isReportingManager == true)
+                const ApprovalCenterCard(),
 
               const ApplyRequestsCard(),
 

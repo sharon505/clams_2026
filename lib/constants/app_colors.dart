@@ -31,7 +31,7 @@ class AppColors {
   /// Leave Colors
   static const Color earnedLeave = Color(0xFF009688);       // Teal
   static const Color casualLeave = Color(0xFF42A5F5);       // Blue
-  static const Color officialDuty = Color(0xFF7E57C2);      // Purple
+  static const Color officialDuty = Color(0xFF7E57C2);      // Purplenj
   static const Color sickLeave = Color(0xFFE53935);         // Red
   static const Color lossOfPay = Color(0xFF8D6E63);         // Brown
   static const Color compensatoryOff = Color(0xFFFF9800);   // Orange

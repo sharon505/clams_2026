@@ -10,7 +10,8 @@ import '../../../constants/app_styles.dart';
 import '../../Authentication/providers/auth_provider.dart';
 
 class DashboardHeader extends StatelessWidget {
-  const DashboardHeader({super.key});
+  final VoidCallback? onTap;
+  const DashboardHeader({super.key, this.onTap});
 
   @override
   Widget build(BuildContext context) {
@@ -40,22 +41,25 @@ class DashboardHeader extends StatelessWidget {
               : null,
         ),
         Expanded(
-          child: Column(
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: [
-              Text(
-                (user?.employeeName ?? 'User').split(' ').first,
-                style: AppStyles.heading4,
-                maxLines: 2,
-                overflow: TextOverflow.ellipsis,
-              ),
-              Text(
-                user?.designation ?? '',
-                style: AppStyles.bodyMedium,
-                maxLines: 1,
-                overflow: TextOverflow.ellipsis,
-              ),
-            ],
+          child: InkWell(
+            onTap:  onTap,
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Text(
+                  (user?.employeeName ?? 'User').split(' ').first,
+                  style: AppStyles.heading4,
+                  maxLines: 2,
+                  overflow: TextOverflow.ellipsis,
+                ),
+                Text(
+                  user?.designation ?? '',
+                  style: AppStyles.bodyMedium,
+                  maxLines: 1,
+                  overflow: TextOverflow.ellipsis,
+                ),
+              ],
+            ),
           ),
         ),
 
