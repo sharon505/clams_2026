@@ -1,29 +1,28 @@
+import 'package:clams/constants/app_colors.dart';
+import 'package:clams/constants/app_styles.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 
-import 'package:clams/constants/app_colors.dart';
-import 'package:clams/constants/app_radius.dart';
-import 'package:clams/constants/app_styles.dart';
-
 class CustomInputCard extends StatelessWidget {
-  final IconData icon;
+  final IconData? icon;
   final String label;
-  final String hintText;
   final Widget child;
+  final bool isTextArea;
 
   const CustomInputCard._({
     super.key,
-    required this.icon,
+    this.icon,
     required this.label,
-    required this.hintText,
     required this.child,
+    this.isTextArea = false,
   });
 
   //----------------------------------------------------------------------------
   // TEXT FIELD
   //----------------------------------------------------------------------------
   factory CustomInputCard.textField({
+    Key? key,
     required IconData icon,
     required String label,
     required String hintText,
@@ -34,68 +33,43 @@ class CustomInputCard extends StatelessWidget {
     VoidCallback? onTap,
     String? Function(String?)? validator,
     int maxLines = 1,
-    TextStyle? style,
-    EdgeInsetsGeometry? contentPadding,
     Widget? suffixIcon,
+    TextStyle? style,
   }) {
     return CustomInputCard._(
+      key: key,
       icon: icon,
       label: label,
-      hintText: hintText,
       child: TextFormField(
         controller: controller,
         keyboardType: keyboardType,
         maxLines: maxLines,
-        validator: validator,
         readOnly: readOnly,
         onTap: onTap,
+        validator: validator,
         inputFormatters: inputFormatters,
-        style: style ?? AppStyles.bodyMedium,
         autovalidateMode: AutovalidateMode.onUserInteraction,
+        style: style ??
+            AppStyles.bodyMedium.copyWith(
+              fontSize: 15.sp,
+              fontWeight: FontWeight.w500,
+            ),
         decoration: InputDecoration(
           hintText: hintText,
           hintStyle: AppStyles.bodyMedium.copyWith(
-            color: AppColors.textColor.withOpacity(.5),
+            fontSize: 15.sp,
+            color: AppColors.textColor.withOpacity(.45),
           ),
+          border: InputBorder.none,
+          enabledBorder: InputBorder.none,
+          focusedBorder: InputBorder.none,
+          errorBorder: InputBorder.none,
+          focusedErrorBorder: InputBorder.none,
+          disabledBorder: InputBorder.none,
           isDense: true,
+          filled: false,
+          contentPadding: EdgeInsets.zero,
           suffixIcon: suffixIcon,
-          contentPadding:
-          contentPadding ??
-              EdgeInsets.symmetric(
-                horizontal: 12.w,
-                vertical: 12.h,
-              ),
-          filled: true,
-          fillColor: AppColors.primarySecondary.withOpacity(.25),
-          border: OutlineInputBorder(
-            borderRadius: AppRadius.medium,
-            borderSide: BorderSide.none,
-          ),
-          enabledBorder: OutlineInputBorder(
-            borderRadius: AppRadius.medium,
-            borderSide: BorderSide.none,
-          ),
-          focusedBorder: OutlineInputBorder(
-            borderRadius: AppRadius.medium,
-            borderSide: BorderSide(
-              color: AppColors.primaryColor,
-              width: 1,
-            ),
-          ),
-          errorBorder: OutlineInputBorder(
-            borderRadius: AppRadius.medium,
-            borderSide: BorderSide(
-              color: AppColors.error,
-              width: 1,
-            ),
-          ),
-          focusedErrorBorder: OutlineInputBorder(
-            borderRadius: AppRadius.medium,
-            borderSide: BorderSide(
-              color: AppColors.error,
-              width: 1,
-            ),
-          ),
         ),
       ),
     );
@@ -105,6 +79,7 @@ class CustomInputCard extends StatelessWidget {
   // DROPDOWN
   //----------------------------------------------------------------------------
   factory CustomInputCard.dropdown({
+    Key? key,
     required IconData icon,
     required String label,
     required String hintText,
@@ -114,19 +89,29 @@ class CustomInputCard extends StatelessWidget {
     String? Function(String?)? validator,
   }) {
     return CustomInputCard._(
+      key: key,
       icon: icon,
       label: label,
-      hintText: hintText,
       child: DropdownButtonFormField<String>(
         value: selectedItem,
         isExpanded: true,
-        autovalidateMode: AutovalidateMode.onUserInteraction,
         validator: validator,
-        style: AppStyles.bodyMedium,
+        autovalidateMode: AutovalidateMode.onUserInteraction,
+        style: AppStyles.bodyMedium.copyWith(
+          fontSize: 15.sp,
+          color: AppColors.textColor,
+        ),
+        decoration: const InputDecoration(
+          border: InputBorder.none,
+          enabledBorder: InputBorder.none,
+          focusedBorder: InputBorder.none,
+          contentPadding: EdgeInsets.zero,
+        ),
         hint: Text(
           hintText,
           style: AppStyles.bodyMedium.copyWith(
-            color: AppColors.textColor.withOpacity(.5),
+            fontSize: 15.sp,
+            color: AppColors.textColor.withOpacity(.45),
           ),
         ),
         items: dropdownItems
@@ -135,36 +120,52 @@ class CustomInputCard extends StatelessWidget {
             value: item,
             child: Text(
               item,
-              style: AppStyles.bodyMedium,
               overflow: TextOverflow.ellipsis,
             ),
           ),
         )
             .toList(),
         onChanged: onChanged,
+      ),
+    );
+  }
+
+  //----------------------------------------------------------------------------
+  // TEXT AREA
+  //----------------------------------------------------------------------------
+  factory CustomInputCard.textArea({
+    Key? key,
+    required String label,
+    required String hintText,
+    required TextEditingController controller,
+    String? Function(String?)? validator,
+    int maxLines = 5,
+  }) {
+    return CustomInputCard._(
+      key: key,
+      label: label,
+      isTextArea: true,
+      child: TextFormField(
+        controller: controller,
+        validator: validator,
+        maxLines: maxLines,
+        minLines: maxLines,
+        textAlignVertical: TextAlignVertical.top,
+        style: AppStyles.bodyMedium.copyWith(
+          fontSize: 15.sp,
+        ),
         decoration: InputDecoration(
-          isDense: true,
-          contentPadding: EdgeInsets.symmetric(
-            horizontal: 12.w,
-            vertical: 12.h,
+          hintText: hintText,
+          hintStyle: AppStyles.bodyMedium.copyWith(
+            fontSize: 15.sp,
+            color: AppColors.textColor.withOpacity(.45),
           ),
-          filled: true,
-          fillColor: AppColors.primarySecondary.withOpacity(.25),
-          border: OutlineInputBorder(
-            borderRadius: AppRadius.medium,
-            borderSide: BorderSide.none,
-          ),
-          enabledBorder: OutlineInputBorder(
-            borderRadius: AppRadius.medium,
-            borderSide: BorderSide.none,
-          ),
-          focusedBorder: OutlineInputBorder(
-            borderRadius: AppRadius.medium,
-            borderSide: BorderSide(
-              color: AppColors.primaryColor,
-              width: 1,
-            ),
-          ),
+          border: InputBorder.none,
+          enabledBorder: InputBorder.none,
+          focusedBorder: InputBorder.none,
+          errorBorder: InputBorder.none,
+          focusedErrorBorder: InputBorder.none,
+          contentPadding: EdgeInsets.zero,
         ),
       ),
     );
@@ -175,52 +176,58 @@ class CustomInputCard extends StatelessWidget {
   //----------------------------------------------------------------------------
   @override
   Widget build(BuildContext context) {
-    return Container(
-      margin: EdgeInsets.symmetric(vertical: 6.h),
-      padding: EdgeInsets.all(12.w),
-      decoration: BoxDecoration(
-        color: AppColors.white,
-        borderRadius: AppRadius.medium,
-        // border: Border.all(
-        //   color: AppColors.primarySecondary,
-        // ),
-      ),
-      child: Row(
-        crossAxisAlignment: CrossAxisAlignment.center,
+    return Padding(
+      padding: EdgeInsets.symmetric(vertical: 6.h),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          // ICON
-          Container(
-            width: 38.w,
-            height: 38.h,
-            decoration: BoxDecoration(
-              color: AppColors.primarySecondary,
-              shape: BoxShape.circle,
-            ),
-            child: Center(
-              child: Icon(
-                icon,
-                color: AppColors.primaryColor,
-                size: 16.r,
+          Padding(
+            padding: EdgeInsets.only(left: 10.w),
+            child: Text(
+              label,
+              style: AppStyles.bodySmall.copyWith(
+                fontSize: 13.sp,
+                fontWeight: FontWeight.w600,
+                color: AppColors.textColor,
               ),
             ),
           ),
-
-          SizedBox(width: 12.w),
-
-          // CONTENT
-          Expanded(
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
+          SizedBox(height: 6.h),
+          Container(
+            height: isTextArea ? 120.h : 56.h,
+            padding: EdgeInsets.symmetric(
+              horizontal: isTextArea ? 16.w : 8.w,
+              vertical: isTextArea ? 16.h : 0,
+            ),
+            decoration: BoxDecoration(
+              color: AppColors.white,
+              borderRadius: BorderRadius.circular(
+                isTextArea ? 22.r : 30.r,
+              ),
+              border: Border.all(
+                color: AppColors.primarySecondary,
+                width: 1.2,
+              ),
+            ),
+            child: isTextArea
+                ? child
+                : Row(
               children: [
-                Text(
-                  label,
-                  style: AppStyles.bodySmall.copyWith(
-                    color: AppColors.textColor.withOpacity(.7),
-                    fontWeight: FontWeight.w500,
+                Container(
+                  width: 38.w,
+                  height: 38.h,
+                  decoration: const BoxDecoration(
+                    color: AppColors.primarySecondary,
+                    shape: BoxShape.circle,
+                  ),
+                  child: Icon(
+                    icon,
+                    color: AppColors.primaryColor,
+                    size: 18.sp,
                   ),
                 ),
-                SizedBox(height: 8.h),
-                child,
+                SizedBox(width: 10.w),
+                Expanded(child: child),
               ],
             ),
           ),

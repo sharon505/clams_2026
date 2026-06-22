@@ -96,7 +96,7 @@ class _ApplyLeaveState extends State<ApplyLeave> {
         Navigator.pop(context, result);
       },
       child: Scaffold(
-        appBar: AppBar(title: Text('Apply Leave')),
+        appBar: AppBar(title: Text('Apply Leave'),centerTitle: true),
         body: SafeArea(
           child: Padding(
             padding: AppPadding.cardPadding,
@@ -188,12 +188,33 @@ class _ApplyLeaveState extends State<ApplyLeave> {
   // FORM CARD
   // ----------------------------------------------------------
   Widget _formCard() {
-
     return Column(
       children: [
-        _dropdownSection(),
-        _textFields(),
-        const CustomCalendarPage(), // 🔒 calendar locked
+        Container(
+          width: double.infinity,
+          padding: EdgeInsets.all(16.w),
+          decoration: BoxDecoration(
+            color: AppColors.white,
+            borderRadius: AppRadius.medium,
+            boxShadow: [
+              BoxShadow(
+                color: Colors.black.withOpacity(0.05),
+                blurRadius: 10,
+                offset: const Offset(0, 4),
+              ),
+            ],
+          ),
+          child: Column(
+            children: [
+              _dropdownSection(),
+              _textFields(),
+            ],
+          ),
+        ),
+
+        SizedBox(height: 16.h),
+
+        const CustomCalendarPage(), // Calendar outside the container
       ],
     );
   }
@@ -256,15 +277,14 @@ class _ApplyLeaveState extends State<ApplyLeave> {
             //   padding: AppPadding.horizontalOnly,
             //   child: Divider(color: AppColors.primaryColor),
             // ),
-            CustomInputCard.textField(
-              icon: Icons.description,
+            CustomInputCard.textArea(
               label: 'Leave Reason',
               hintText: 'Enter your reason',
               controller: provider.reasonController,
-              keyboardType: TextInputType.multiline,
               validator: (v) =>
               v == null || v.trim().isEmpty ? 'Reason required' : null,
             ),
+            SizedBox(height: 10.h,)
           ],
         );
       },
@@ -277,8 +297,8 @@ class _ApplyLeaveState extends State<ApplyLeave> {
   }) {
     final days = context.watch<LeaveTypeProvider>().selectedLeaveDays;
 
-    return Padding(
-      padding: AppPadding.cardPadding,
+    return SafeArea(
+      bottom: true,
       child: SizedBox(
         width: double.infinity,
         height: 50.h,
@@ -287,9 +307,6 @@ class _ApplyLeaveState extends State<ApplyLeave> {
           style: ElevatedButton.styleFrom(
             backgroundColor: AppColors.primaryColor,
             elevation: 0,
-            padding: EdgeInsets.symmetric(
-              vertical: 14.h,
-            ),
             shape: RoundedRectangleBorder(
               borderRadius: AppRadius.medium,
             ),
@@ -298,7 +315,7 @@ class _ApplyLeaveState extends State<ApplyLeave> {
               ? SizedBox(
             width: 20.w,
             height: 20.h,
-            child: CircularProgressIndicator(
+            child: const CircularProgressIndicator(
               strokeWidth: 2,
               color: AppColors.white,
             ),
@@ -335,7 +352,7 @@ class CustomCalendarPage extends StatelessWidget {
           onSelectDay: provider.selectDay,
           // availableGestures: AvailableGestures.none, // 🔒 LOCK SCROLL
           headerVisible: true,
-          dateFormat: 'EEE, dd MMM yyyy',
+          // dateFormat: 'EEE, dd MMM yyyy',
         );
       },
     );

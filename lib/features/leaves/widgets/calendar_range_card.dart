@@ -2,10 +2,12 @@ import 'package:clams/constants/app_colors.dart';
 import 'package:clams/constants/app_padding.dart';
 import 'package:clams/constants/app_radius.dart';
 import 'package:clams/constants/app_styles.dart';
-import 'package:clams/constants/app_textfield.dart';
+
 import 'package:flutter/material.dart';
+import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:intl/intl.dart';
 import 'package:table_calendar/table_calendar.dart';
+
 
 class CalendarRangeCard extends StatelessWidget {
   const CalendarRangeCard({
@@ -16,8 +18,6 @@ class CalendarRangeCard extends StatelessWidget {
     required this.onSelectDay,
     this.fromDate,
     this.toDate,
-    this.dateFormat = 'EEE, dd MMM yyyy',
-    this.showDivider = true,
     this.headerTitleCentered = false,
     this.headerVisible = true,
     this.calendarFormat = CalendarFormat.month,
@@ -28,54 +28,99 @@ class CalendarRangeCard extends StatelessWidget {
   final DateTime lastAllowedDate;
   final DateTime? fromDate;
   final DateTime? toDate;
-  final void Function(DateTime selectedDay, DateTime focusedDay) onSelectDay;
-  final String dateFormat;
-  final bool showDivider;
+
+  final void Function(
+      DateTime selectedDay,
+      DateTime focusedDay,
+      ) onSelectDay;
+
   final bool headerTitleCentered;
   final bool headerVisible;
   final CalendarFormat calendarFormat;
 
   @override
   Widget build(BuildContext context) {
-    final fmt = DateFormat(dateFormat);
-
+    final formatter = DateFormat("dd MMM yyyy");
 
     return Container(
+      padding: EdgeInsets.all(14.w),
       decoration: BoxDecoration(
         color: AppColors.white,
         borderRadius: AppRadius.medium,
         boxShadow: [
           BoxShadow(
-            color: AppColors.primaryColor.withOpacity(0.08),
+            color: AppColors.primaryColor.withOpacity(.08),
             blurRadius: 12,
             offset: const Offset(0, 4),
           ),
         ],
       ),
       child: Column(
-        mainAxisSize: MainAxisSize.min,
-        crossAxisAlignment: CrossAxisAlignment.start,
         children: [
+          //================ DATE RANGE CARD =================
 
-          /// FROM FIELD
-          CustomInputCard.textField(
-            readOnly: true,
-            icon: Icons.calendar_month,
-            label: 'From',
-            hintText: fmt.format(fromDate ?? focusedDay),
-            controller: TextEditingController(),
-            keyboardType: TextInputType.multiline,
+          Container(
+            width: double.infinity,
+            padding: EdgeInsets.symmetric(
+              horizontal: 16.w,
+              vertical: 14.h,
+            ),
+            decoration: BoxDecoration(
+              color: AppColors.primarySecondary.withOpacity(.18),
+              borderRadius: BorderRadius.circular(14.r),
+              border: Border.all(
+                color: AppColors.primarySecondary,
+              ),
+            ),
+            child: Row(
+              children: [
+                Container(
+                  width: 42.w,
+                  height: 42.h,
+                  decoration: const BoxDecoration(
+                    color: AppColors.white,
+                    shape: BoxShape.circle,
+                  ),
+                  child: const Icon(
+                    Icons.calendar_month,
+                    color: AppColors.primaryColor,
+                  ),
+                ),
+
+                SizedBox(width: 12.w),
+
+                Expanded(
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      Text(
+                        "Selected Date Range",
+                        style: AppStyles.bodySmall.copyWith(
+                          color: Colors.grey.shade700,
+                          fontWeight: FontWeight.w600,
+                        ),
+                      ),
+
+                      SizedBox(height: 4.h),
+
+                      Text(
+                        "${fromDate == null ? "Select Date" : formatter.format(fromDate!)}"
+                            "   →   "
+                            "${toDate == null ? "Select Date" : formatter.format(toDate!)}",
+                        style: AppStyles.bodyMedium.copyWith(
+                          fontWeight: FontWeight.bold,
+                        ),
+                      ),
+                    ],
+                  ),
+                ),
+              ],
+            ),
           ),
 
-          /// TO FIELD (ALWAYS VISIBLE)
-          CustomInputCard.textField(
-            readOnly: true,
-            icon: Icons.calendar_month,
-            label: 'To',
-            hintText: fmt.format(toDate ?? fromDate ?? focusedDay),
-            controller: TextEditingController(),
-            keyboardType: TextInputType.multiline,
-          ),
+          SizedBox(height: 16.h),
+
+          //================ CALENDAR =================
 
           _CalendarCore(
             focusedDay: focusedDay,
@@ -94,6 +139,8 @@ class CalendarRangeCard extends StatelessWidget {
   }
 }
 
+
+///selected
 class _CalendarCore extends StatelessWidget {
   const _CalendarCore({
     required this.focusedDay,
@@ -115,75 +162,162 @@ class _CalendarCore extends StatelessWidget {
   final bool headerTitleCentered;
   final bool headerVisible;
   final CalendarFormat calendarFormat;
-  final void Function(DateTime selectedDay, DateTime focusedDay) onSelectDay;
+
+  final void Function(
+      DateTime selectedDay,
+      DateTime focusedDay,
+      ) onSelectDay;
 
   @override
   Widget build(BuildContext context) {
-    return Padding(
-      padding: AppPadding.horizontalOnly,
-      child: TableCalendar(
-        firstDay: firstAllowedDate,
-        lastDay: lastAllowedDate,
-        focusedDay: focusedDay,
-        availableGestures: AvailableGestures.horizontalSwipe,
-        calendarFormat: calendarFormat,
+    return TableCalendar(
+      firstDay: firstAllowedDate,
+      lastDay: lastAllowedDate,
+      focusedDay: focusedDay,
 
-        /// RANGE HIGHLIGHT
-        rangeStartDay: fromDate,
-        rangeEndDay: toDate,
+      calendarFormat: calendarFormat,
+      availableGestures: AvailableGestures.horizontalSwipe,
 
-        onDaySelected: onSelectDay,
+      selectedDayPredicate: (_) => false,
 
-        enabledDayPredicate: (day) => !day.isBefore(firstAllowedDate),
+      rangeStartDay: fromDate,
+      rangeEndDay: toDate,
 
-        calendarStyle: CalendarStyle(
-          // REMOVE today circle
-          todayDecoration: const BoxDecoration(
-            color: Colors.transparent,
-            shape: BoxShape.circle,
+      onDaySelected: onSelectDay,
+
+      enabledDayPredicate: (day) => !day.isBefore(firstAllowedDate),
+
+      daysOfWeekHeight: 32,
+      rowHeight: 48,
+
+      headerStyle: HeaderStyle(
+        titleCentered: true,
+        formatButtonVisible: false,
+
+        leftChevronIcon: Container(
+          padding: const EdgeInsets.all(4),
+          decoration: BoxDecoration(
+            color: AppColors.primarySecondary.withOpacity(.35),
+            borderRadius: BorderRadius.circular(8),
           ),
-
-          todayTextStyle: const TextStyle(
-            color: Colors.black,
-            fontWeight: FontWeight.normal,
-          ),
-
-          // Range start
-          rangeStartDecoration: const BoxDecoration(
+          child: const Icon(
+            Icons.chevron_left_rounded,
+            size: 20,
             color: AppColors.primaryColor,
-            shape: BoxShape.circle,
           ),
-
-          // Range end
-          rangeEndDecoration: const BoxDecoration(
-            color: AppColors.primaryColor,
-            shape: BoxShape.circle,
-          ),
-
-          // Middle highlight
-          rangeHighlightColor: AppColors.primaryColor.withOpacity(.25),
-
-          // Remove selected circle
-          selectedDecoration: const BoxDecoration(
-            color: Colors.transparent,
-          ),
-
-          selectedTextStyle: const TextStyle(
-            color: Colors.black,
-          ),
-
-          cellMargin: AppPadding.allSmall,
         ),
 
-        headerStyle: HeaderStyle(
-          formatButtonVisible: false,
-          titleCentered: false,
-          leftChevronVisible: false,
-          rightChevronVisible: false,
-          headerPadding: AppPadding.allSmall.copyWith(top: 0),
-          titleTextStyle: AppStyles.heading2,
-          titleTextFormatter: (date, locale) =>
-          headerVisible ? DateFormat('MMMM yyyy').format(date) : '',
+        rightChevronIcon: Container(
+          padding: const EdgeInsets.all(4),
+          decoration: BoxDecoration(
+            color: AppColors.primarySecondary.withOpacity(.35),
+            borderRadius: BorderRadius.circular(8),
+          ),
+          child: const Icon(
+            Icons.chevron_right_rounded,
+            size: 20,
+            color: AppColors.primaryColor,
+          ),
+        ),
+
+        titleTextStyle: AppStyles.heading2.copyWith(
+          fontWeight: FontWeight.w700,
+        ),
+
+        headerPadding: EdgeInsets.symmetric(
+          vertical: 12.h,
+        ),
+      ),
+
+      daysOfWeekStyle: DaysOfWeekStyle(
+        weekdayStyle: AppStyles.bodySmall.copyWith(
+          color: Colors.grey.shade700,
+          fontWeight: FontWeight.w600,
+        ),
+        weekendStyle: AppStyles.bodySmall.copyWith(
+          color: Colors.redAccent,
+          fontWeight: FontWeight.w600,
+        ),
+      ),
+
+      calendarStyle: CalendarStyle(
+        outsideDaysVisible: false,
+
+        cellMargin: EdgeInsets.all(4.w),
+
+        defaultDecoration: BoxDecoration(
+          borderRadius: BorderRadius.circular(10.r),
+        ),
+
+        weekendDecoration: BoxDecoration(
+          borderRadius: BorderRadius.circular(10.r),
+        ),
+
+        todayDecoration: BoxDecoration(
+          borderRadius: BorderRadius.circular(10.r),
+          border: Border.all(
+            color: AppColors.primaryColor,
+            width: 1.6,
+          ),
+        ),
+
+        todayTextStyle: AppStyles.bodyMedium.copyWith(
+          color: AppColors.primaryColor,
+          fontWeight: FontWeight.bold,
+        ),
+
+        /// Disable default selected state
+        selectedDecoration: const BoxDecoration(
+          color: Colors.transparent,
+        ),
+
+        selectedTextStyle: AppStyles.bodyMedium,
+
+        /// Range Start
+        rangeStartDecoration: BoxDecoration(
+          color: AppColors.primaryColor,
+          borderRadius: BorderRadius.circular(10.r),
+        ),
+
+        rangeStartTextStyle: AppStyles.bodyMedium.copyWith(
+          color: Colors.white,
+          fontWeight: FontWeight.bold,
+        ),
+
+        /// Range End
+        rangeEndDecoration: BoxDecoration(
+          color: AppColors.primaryColor,
+          borderRadius: BorderRadius.circular(10.r),
+        ),
+
+        rangeEndTextStyle: AppStyles.bodyMedium.copyWith(
+          color: Colors.white,
+          fontWeight: FontWeight.bold,
+        ),
+
+        /// Between Start & End
+        withinRangeDecoration: BoxDecoration(
+          color: AppColors.primaryColor.withOpacity(.12),
+          borderRadius: BorderRadius.circular(8.r),
+        ),
+
+        withinRangeTextStyle: AppStyles.bodyMedium.copyWith(
+          color: AppColors.primaryColor,
+          fontWeight: FontWeight.w600,
+        ),
+
+        defaultTextStyle: AppStyles.bodyMedium,
+
+        weekendTextStyle: AppStyles.bodyMedium.copyWith(
+          color: Colors.redAccent,
+        ),
+
+        outsideTextStyle: AppStyles.bodySmall.copyWith(
+          color: Colors.grey.shade400,
+        ),
+
+        disabledTextStyle: AppStyles.bodySmall.copyWith(
+          color: Colors.grey.shade300,
         ),
       ),
     );

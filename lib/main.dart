@@ -11,6 +11,11 @@ import 'package:clams/features/leaves/providers/leaveSummary_viewModel.dart';
 import 'package:clams/features/leaves/providers/leaveType_viewModel.dart';
 import 'package:clams/features/leaves/screens/leave_details_screen.dart';
 import 'package:clams/features/leaves/screens/leaves_view.dart';
+import 'package:clams/features/movement/viewmodel/applyMovement_viewModel.dart';
+import 'package:clams/features/movement/viewmodel/cancelMovment_viewModel.dart';
+import 'package:clams/features/movement/viewmodel/movementForm_ViewModel.dart';
+import 'package:clams/features/movement/viewmodel/movementView_viewModel.dart';
+import 'package:clams/features/movement/views/movementApply_view.dart';
 import 'package:clams/features/profile/provider/LeaveBalance_viewModel.dart';
 import 'package:clams/features/profile/provider/employee_viewModel.dart';
 import 'package:clams/features/profile/views/profile_view.dart';
@@ -74,6 +79,11 @@ List<SingleChildWidget> providers = [
   ///profile--------------------------------------------------------------------
   ChangeNotifierProvider(create: (_) => EmployeeViewModel()),
   ChangeNotifierProvider(create: (_) => LeaveBalanceProvider()),
+  ///Movement-------------------------------------------------------------------
+  ChangeNotifierProvider(create: (_) => ApplyMovementViewModel()),
+  ChangeNotifierProvider(create: (_) => MovementCancelProvider()),
+  ChangeNotifierProvider(create: (_) => MovementFormViewModel()),
+  ChangeNotifierProvider(create: (_) => MovementReportProvider()),
 ];
 
 Map<String, Widget Function(BuildContext)> routes = <String, WidgetBuilder>{
@@ -90,6 +100,8 @@ Map<String, Widget Function(BuildContext)> routes = <String, WidgetBuilder>{
   'AttendanceCalendar':    (context) => const AttendanceCalendar(),
   ///profile--------------------------------------------------------------------
   'ProfileView':           (context) => const ProfileView(),
+  ///Movement-------------------------------------------------------------------
+  'ApplyMovement':         (context) => const MovementApplyView(),
 };
 
 class MyApp extends StatelessWidget {

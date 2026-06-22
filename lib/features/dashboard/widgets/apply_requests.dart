@@ -42,6 +42,7 @@ class ApplyRequestsCard extends StatelessWidget {
                 icon: Icons.directions_walk,
                 backgroundColor: Color(0xFFFFEBEE),
                 iconColor: Colors.red,
+                onTap: () => Navigator.pushNamed(context, 'ApplyMovement'),
               ),
               ApplyRequestItem(
                 title: 'Apply\nTravel',
