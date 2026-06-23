@@ -11,6 +11,7 @@ import 'package:clams/features/Attendance/widgets/attendance_ot_card.dart';
 import 'package:clams/features/Authentication/providers/auth_provider.dart';
 
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:intl/intl.dart';
 import 'package:provider/provider.dart';
@@ -186,14 +187,16 @@ class _AttendanceCalendarState extends State<AttendanceCalendar> {
                           return day.month == _focusedDay.month;
                         },
 
-                        onDaySelected: (selected, focused) {
+                        onDaySelected: (selected, focused)async {
+                          await HapticFeedback.mediumImpact();
                           setState(() {
                             _selectedDay = selected;
                             _focusedDay = focused;
                           });
                         },
 
-                        onPageChanged: (focused) {
+                        onPageChanged: (focused) async{
+                          await HapticFeedback.heavyImpact();
                           final firstDay = DateTime(
                             focused.year,
                             focused.month,

@@ -6,12 +6,13 @@ import 'package:clams/constants/app_textfield.dart';
 import 'package:clams/features/leaves/providers/leaveApply_viewModel.dart';
 import 'package:clams/features/leaves/providers/leaveType_viewModel.dart';
 import 'package:clams/features/leaves/widgets/calendar_range_card.dart';
+import 'package:clams/features/leaves/widgets/drop_down_shimmer.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/rendering.dart';
+import 'package:flutter/services.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
+import 'package:fluttertoast/fluttertoast.dart';
 import 'package:provider/provider.dart';
-
-import '../services/leave_service.dart';
 
 class ApplyLeave extends StatefulWidget {
   const ApplyLeave({super.key});
@@ -21,7 +22,6 @@ class ApplyLeave extends StatefulWidget {
 }
 
 class _ApplyLeaveState extends State<ApplyLeave> {
-
   final GlobalKey<FormState> _formKey = GlobalKey<FormState>();
   final ScrollController _scrollController = ScrollController();
 
@@ -59,21 +59,15 @@ class _ApplyLeaveState extends State<ApplyLeave> {
     _dateInitialized = true;
 
     final args =
-    ModalRoute.of(context)?.settings.arguments as Map<String, dynamic>?;
+        ModalRoute.of(context)?.settings.arguments as Map<String, dynamic>?;
 
     WidgetsBinding.instance.addPostFrameCallback((_) {
       if (args != null && args['date'] is DateTime) {
         // ✅ Use passed date
         _leaveProvider!.setInitialDate(args['date']);
-      } else {
-        // ✅ Default to yesterday
-        final yesterday = DateTime.now().subtract(const Duration(days: 1));
-        _leaveProvider!.setInitialDate(yesterday);
       }
     });
   }
-
-
 
   @override
   void dispose() {
@@ -82,10 +76,23 @@ class _ApplyLeaveState extends State<ApplyLeave> {
     super.dispose();
   }
 
+  void showToast(
+    String message, {
+    Color backgroundColor = AppColors.success,
+    ToastGravity gravity = ToastGravity.BOTTOM,
+  }) {
+    Fluttertoast.showToast(
+      msg: message,
+      toastLength: Toast.LENGTH_SHORT,
+      gravity: gravity,
+      backgroundColor: backgroundColor,
+      textColor: Colors.white,
+      fontSize: 14.sp,
+    );
+  }
+
   @override
   Widget build(BuildContext context) {
-    final leaveService = LeaveService();
-
     return PopScope(
       canPop: true,
       onPopInvokedWithResult: (didPop, result) {
@@ -96,7 +103,7 @@ class _ApplyLeaveState extends State<ApplyLeave> {
         Navigator.pop(context, result);
       },
       child: Scaffold(
-        appBar: AppBar(title: Text('Apply Leave'),centerTitle: true),
+        appBar: AppBar(title: Text('Apply Leave'), centerTitle: true),
         body: SafeArea(
           child: Padding(
             padding: AppPadding.cardPadding,
@@ -115,60 +122,77 @@ class _ApplyLeaveState extends State<ApplyLeave> {
                           isLoading: applyP.isSubmitting,
                           onPressed: () async {
                             if (!(_formKey.currentState?.validate() ?? false)) {
-                              // _showDialog(
-                              //   'INFO',
-                              //   'Some fields are missing.',
-                              //   'Please complete all required fields.',
-                              //   DialogType.warning,
-                              // );
-                              // return;
+                              showToast(
+                                'Please complete all required fields.',
+                                backgroundColor: AppColors.warning,
+                              );
+                              return;
                             }
 
-                            final leaveP = context.read<LeaveTypeProvider>();
+                            final provider = context.read<LeaveTypeProvider>();
 
-                            if (leaveP.fromDate == null) {
-                              // _showDialog(
-                              //   'INFO',
-                              //   'Date not selected',
-                              //   'Please select a date.',
-                              //   DialogType.warning,
-                              // );
-                              // return;
+                            if (provider.fromDate == null) {
+                              showToast(
+                                'Please select a leave date.',
+                                backgroundColor: AppColors.warning,
+                              );
+                              return;
                             }
 
-                            if (leaveP.selectedLeaveType == null) {
-                              // _showDialog(
-                              //   'INFO',
-                              //   'Leave type not selected',
-                              //   'Please choose a leave type.',
-                              //   DialogType.warning,
-                              // );
-                              // return;
+                            if (provider.selectedLeaveType == null) {
+                              showToast(
+                                'Please choose a leave type.',
+                                backgroundColor: AppColors.warning,
+                              );
+                              return;
+                            }
+
+                            if (provider.selectedDayType.isEmpty) {
+                              showToast(
+                                'Please select a day type.',
+                                backgroundColor: AppColors.warning,
+                              );
+                              return;
+                            }
+
+                            if (provider.selectedDayType == 'Half Day' &&
+                                provider.selectedLeaveSection.isEmpty) {
+                              showToast(
+                                'Please select a leave section.',
+                                backgroundColor: AppColors.warning,
+                              );
+                              return;
                             }
 
                             final res = await applyP.submit(context);
 
                             if (res != null && res.result.isNotEmpty) {
                               final r = res.result.first;
+
                               if (r.statusId == 200) {
-                                // _showDialog(
-                                //   'Success',
-                                //   'Leave Applied Successfully',
-                                //   'Your leave request has been submitted.',
-                                //   DialogType.success,
-                                //   onOk: () {
-                                //     Navigator.pushReplacementNamed(
-                                //         context, 'BottomNavView');
-                                //   },
-                                // );
+                                showToast(
+                                  'Leave applied successfully',
+                                  backgroundColor: AppColors.success,
+                                );
+
+                                await Future.delayed(
+                                  const Duration(milliseconds: 800),
+                                );
+
+                                if (context.mounted) {
+                                  Navigator.pop(context, true);
+                                }
                               } else {
-                                // _showDialog(
-                                //   'Failed',
-                                //   'Leave Application Failed',
-                                //   r.msg,
-                                //   DialogType.error,
-                                // );
+                                showToast(
+                                  r.msg,
+                                  backgroundColor: AppColors.error,
+                                );
                               }
+                            } else {
+                              showToast(
+                                'Failed to apply leave.',
+                                backgroundColor: AppColors.error,
+                              );
                             }
                           },
                         );
@@ -190,6 +214,8 @@ class _ApplyLeaveState extends State<ApplyLeave> {
   Widget _formCard() {
     return Column(
       children: [
+        const CustomCalendarPage(), // Calendar outside the container
+        SizedBox(height: 16.h),
         Container(
           width: double.infinity,
           padding: EdgeInsets.all(16.w),
@@ -204,33 +230,20 @@ class _ApplyLeaveState extends State<ApplyLeave> {
               ),
             ],
           ),
-          child: Column(
-            children: [
-              _dropdownSection(),
-              _textFields(),
-            ],
-          ),
+          child: Column(children: [_dropdownSection(), _textFields()]),
         ),
-
-        SizedBox(height: 16.h),
-
-        const CustomCalendarPage(), // Calendar outside the container
       ],
     );
   }
 
   Widget _dropdownSection() {
     return Consumer<LeaveTypeProvider>(
-      builder: (_, leaveP, __) {
-
-        if (leaveP.isLoading) {
-          return const Center(
-            child: CircularProgressIndicator(),
-          );
+      builder: (_, provider, __) {
+        if (provider.isLoading) {
+          return DropdownShimmer();
         }
 
-        final leaveTypes =
-        leaveP.leaveTypes.map((e) => e.leaveType).toList();
+        final leaveTypes = provider.leaveTypes.map((e) => e.leaveType).toList();
 
         return Column(
           children: [
@@ -239,17 +252,16 @@ class _ApplyLeaveState extends State<ApplyLeave> {
               label: 'Leave Type',
               hintText: 'Choose type',
               dropdownItems: leaveTypes,
-              selectedItem: leaveP.selectedLeaveType?.leaveType,
-              onChanged: (val) {
-                final selected = leaveP.leaveTypes.firstWhere(
-                      (e) => e.leaveType == val,
+              selectedItem: provider.selectedLeaveType?.leaveType,
+              onChanged: (val) async {
+                await HapticFeedback.heavyImpact();
+                final selected = provider.leaveTypes.firstWhere(
+                  (e) => e.leaveType == val,
                 );
-                leaveP.setSelectedLeaveType(selected);
+                provider.setSelectedLeaveType(selected);
               },
               validator: (v) =>
-              v == null || v.isEmpty
-                  ? 'Select leave type'
-                  : null,
+                  v == null || v.isEmpty ? 'Select leave type' : null,
             ),
           ],
         );
@@ -262,6 +274,31 @@ class _ApplyLeaveState extends State<ApplyLeave> {
       builder: (_, provider, __) {
         return Column(
           children: [
+            CustomInputCard.dropdown(
+              icon: Icons.access_time,
+              label: 'Day Type',
+              hintText: 'Select Day Type',
+              dropdownItems: provider.dayTypes,
+              selectedItem: provider.selectedDayType,
+              onChanged: (value) {
+                if (value != null) {
+                  provider.setSelectedDayType(value);
+                }
+              },
+            ),
+            if (provider.selectedDayType == 'Half Day')
+              CustomInputCard.dropdown(
+                icon: Icons.schedule,
+                label: 'Leave Section',
+                hintText: 'Select Leave Section',
+                dropdownItems: provider.leaveSections,
+                selectedItem: provider.selectedLeaveSection,
+                onChanged: (value) {
+                  if (value != null) {
+                    provider.setSelectedLeaveSection(value);
+                  }
+                },
+              ),
             // Padding(
             //   padding: AppPadding.horizontalOnly,
             //   child: Divider(color: AppColors.primaryColor),
@@ -282,9 +319,9 @@ class _ApplyLeaveState extends State<ApplyLeave> {
               hintText: 'Enter your reason',
               controller: provider.reasonController,
               validator: (v) =>
-              v == null || v.trim().isEmpty ? 'Reason required' : null,
+                  v == null || v.trim().isEmpty ? 'Reason required' : null,
             ),
-            SizedBox(height: 10.h,)
+            SizedBox(height: 10.h),
           ],
         );
       },
@@ -307,26 +344,24 @@ class _ApplyLeaveState extends State<ApplyLeave> {
           style: ElevatedButton.styleFrom(
             backgroundColor: AppColors.primaryColor,
             elevation: 0,
-            shape: RoundedRectangleBorder(
-              borderRadius: AppRadius.medium,
-            ),
+            shape: RoundedRectangleBorder(borderRadius: AppRadius.medium),
           ),
           child: isLoading
               ? SizedBox(
-            width: 20.w,
-            height: 20.h,
-            child: const CircularProgressIndicator(
-              strokeWidth: 2,
-              color: AppColors.white,
-            ),
-          )
+                  width: 20.w,
+                  height: 20.h,
+                  child: const CircularProgressIndicator(
+                    strokeWidth: 2,
+                    color: AppColors.white,
+                  ),
+                )
               : Text(
-            days == 0.5
-                ? 'Apply Half Day Leave'
-                : 'Apply $days ${days == 1 ? 'Day' : 'Days'} Leave',
-            textAlign: TextAlign.center,
-            style: AppStyles.buttonText,
-          ),
+                  days == 0.5
+                      ? 'Apply Half Day Leave'
+                      : 'Apply $days ${days == 1 ? 'Day' : 'Days'} Leave',
+                  textAlign: TextAlign.center,
+                  style: AppStyles.buttonText,
+                ),
         ),
       ),
     );

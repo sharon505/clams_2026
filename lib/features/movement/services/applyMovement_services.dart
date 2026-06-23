@@ -37,8 +37,22 @@ class ApplyMovementServices {
       }
 
       // ---------- BUILD DATETIME ----------
-      final fromDT = _combine(vm.fromDate!, vm.fromTime!);
-      final toDT = _combine(vm.toDate!, vm.toTime!);
+// ---------- BUILD DATETIME ----------
+      final fromDT = DateTime(
+        vm.fromDate!.year,
+        vm.fromDate!.month,
+        vm.fromDate!.day,
+        vm.startTime.hour,
+        vm.startTime.minute,
+      );
+
+      final toDT = DateTime(
+        vm.toDate!.year,
+        vm.toDate!.month,
+        vm.toDate!.day,
+        vm.endTime.hour,
+        vm.endTime.minute,
+      );
 
       // ---------- REQUEST BODY ----------
       final body = <String, String>{
@@ -112,9 +126,6 @@ class ApplyMovementServices {
   // HELPERS
   // ---------------------------------------------------------------------------
 
-  DateTime _combine(DateTime d, TimeOfDay t) {
-    return DateTime(d.year, d.month, d.day, t.hour, t.minute);
-  }
 
   String _fmtDateTime(DateTime dt) {
     String two(int n) => n < 10 ? '0$n' : '$n';

@@ -1,15 +1,14 @@
 import 'package:clams/constants/app_colors.dart';
-import 'package:clams/constants/app_padding.dart';
 import 'package:clams/constants/app_radius.dart';
 import 'package:clams/constants/app_styles.dart';
 
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:intl/intl.dart';
 import 'package:table_calendar/table_calendar.dart';
 
-
-class CalendarRangeCard extends StatelessWidget {
+class CalendarRangeCard extends StatefulWidget {
   const CalendarRangeCard({
     super.key,
     required this.focusedDay,
@@ -39,6 +38,14 @@ class CalendarRangeCard extends StatelessWidget {
   final CalendarFormat calendarFormat;
 
   @override
+  State<CalendarRangeCard> createState() => _CalendarRangeCardState();
+}
+
+class _CalendarRangeCardState
+    extends State<CalendarRangeCard> {
+  bool showCalendar = false;
+
+  @override
   Widget build(BuildContext context) {
     final formatter = DateFormat("dd MMM yyyy");
 
@@ -47,92 +54,59 @@ class CalendarRangeCard extends StatelessWidget {
       decoration: BoxDecoration(
         color: AppColors.white,
         borderRadius: AppRadius.medium,
-        boxShadow: [
-          BoxShadow(
-            color: AppColors.primaryColor.withOpacity(.08),
-            blurRadius: 12,
-            offset: const Offset(0, 4),
-          ),
-        ],
       ),
       child: Column(
         children: [
-          //================ DATE RANGE CARD =================
-
-          Container(
-            width: double.infinity,
-            padding: EdgeInsets.symmetric(
-              horizontal: 16.w,
-              vertical: 14.h,
+          /// Switch Tile
+          SwitchListTile(
+            contentPadding: EdgeInsets.zero,
+            title: const Text(
+              "Select Date Range",
             ),
-            decoration: BoxDecoration(
-              color: AppColors.primarySecondary.withOpacity(.18),
-              borderRadius: BorderRadius.circular(14.r),
-              border: Border.all(
-                color: AppColors.primarySecondary,
-              ),
+            subtitle: Text(
+              widget.fromDate == null
+                  ? "No date selected"
+                  : widget.toDate == null ||
+                  DateUtils.isSameDay(
+                    widget.fromDate,
+                    widget.toDate,
+                  )
+                  ? formatter.format(widget.fromDate!)
+                  : "${formatter.format(widget.fromDate!)} ➜ ${formatter.format(widget.toDate!)}",
             ),
-            child: Row(
-              children: [
-                Container(
-                  width: 42.w,
-                  height: 42.h,
-                  decoration: const BoxDecoration(
-                    color: AppColors.white,
-                    shape: BoxShape.circle,
-                  ),
-                  child: const Icon(
-                    Icons.calendar_month,
-                    color: AppColors.primaryColor,
-                  ),
-                ),
+            value: showCalendar,
+            activeColor: AppColors.primaryColor,
+            onChanged: (value) async  {
+              await HapticFeedback.heavyImpact();
 
-                SizedBox(width: 12.w),
-
-                Expanded(
-                  child: Column(
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    children: [
-                      Text(
-                        "Selected Date Range",
-                        style: AppStyles.bodySmall.copyWith(
-                          color: Colors.grey.shade700,
-                          fontWeight: FontWeight.w600,
-                        ),
-                      ),
-
-                      SizedBox(height: 4.h),
-
-                      Text(
-                        "${fromDate == null ? "Select Date" : formatter.format(fromDate!)}"
-                            "   →   "
-                            "${toDate == null ? "Select Date" : formatter.format(toDate!)}",
-                        style: AppStyles.bodyMedium.copyWith(
-                          fontWeight: FontWeight.bold,
-                        ),
-                      ),
-                    ],
-                  ),
-                ),
-              ],
-            ),
+              setState(() {
+                showCalendar = value;
+              });
+            },
           ),
 
-          SizedBox(height: 16.h),
+          if (showCalendar) ...[
 
-          //================ CALENDAR =================
+            Divider(),
 
-          _CalendarCore(
-            focusedDay: focusedDay,
-            firstAllowedDate: firstAllowedDate,
-            lastAllowedDate: lastAllowedDate,
-            fromDate: fromDate,
-            toDate: toDate,
-            headerTitleCentered: headerTitleCentered,
-            headerVisible: headerVisible,
-            calendarFormat: calendarFormat,
-            onSelectDay: onSelectDay,
-          ),
+            _CalendarCore(
+              focusedDay: widget.focusedDay,
+              firstAllowedDate:
+              widget.firstAllowedDate,
+              lastAllowedDate:
+              widget.lastAllowedDate,
+              fromDate: widget.fromDate,
+              toDate: widget.toDate,
+              headerTitleCentered:
+              widget.headerTitleCentered,
+              headerVisible:
+              widget.headerVisible,
+              calendarFormat:
+              widget.calendarFormat,
+              onSelectDay:
+              widget.onSelectDay,
+            ),
+          ],
         ],
       ),
     );
@@ -322,4 +296,130 @@ class _CalendarCore extends StatelessWidget {
       ),
     );
   }
+}
+
+
+Widget buildDateTimeline({
+  required DateTime? fromDate,
+  required DateTime? toDate,
+}) {
+  final formatter = DateFormat("dd MMM yyyy");
+
+  return Container(
+    width: double.infinity,
+    padding: const EdgeInsets.all(16),
+    decoration: BoxDecoration(
+      color: AppColors.primarySecondary.withOpacity(.15),
+      borderRadius: BorderRadius.circular(16),
+      border: Border.all(
+        color: AppColors.primarySecondary,
+      ),
+    ),
+    child: Column(
+      children: [
+        /// START DATE
+        Row(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            Column(
+              children: [
+                Container(
+                  width: 18,
+                  height: 18,
+                  decoration: const BoxDecoration(
+                    color: AppColors.primaryColor,
+                    shape: BoxShape.circle,
+                  ),
+                ),
+                Container(
+                  width: 2,
+                  height: 60,
+                  color: AppColors.primaryColor,
+                ),
+              ],
+            ),
+
+            const SizedBox(width: 12),
+
+            Expanded(
+              child: Column(
+                crossAxisAlignment:
+                CrossAxisAlignment.start,
+                children: [
+                  const Text(
+                    "Start Date",
+                    style: TextStyle(
+                      fontWeight: FontWeight.w600,
+                      color: Colors.grey,
+                    ),
+                  ),
+                  const SizedBox(height: 4),
+                  Text(
+                    fromDate == null
+                        ? "Select Start Date"
+                        : formatter.format(fromDate),
+                    style: const TextStyle(
+                      fontWeight: FontWeight.bold,
+                      fontSize: 16,
+                    ),
+                  ),
+                ],
+              ),
+            ),
+          ],
+        ),
+
+        /// END DATE
+        Row(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            Container(
+              width: 18,
+              height: 18,
+              decoration: BoxDecoration(
+                color: fromDate != null &&
+                    toDate != null
+                    ? AppColors.success
+                    : Colors.grey,
+                shape: BoxShape.circle,
+              ),
+              child: const Icon(
+                Icons.flag,
+                size: 10,
+                color: Colors.white,
+              ),
+            ),
+
+            const SizedBox(width: 12),
+
+            Expanded(
+              child: Column(
+                crossAxisAlignment:
+                CrossAxisAlignment.start,
+                children: [
+                  const Text(
+                    "End Date",
+                    style: TextStyle(
+                      fontWeight: FontWeight.w600,
+                      color: Colors.grey,
+                    ),
+                  ),
+                  const SizedBox(height: 4),
+                  Text(
+                    toDate == null
+                        ? "Select End Date"
+                        : formatter.format(toDate),
+                    style: const TextStyle(
+                      fontWeight: FontWeight.bold,
+                      fontSize: 16,
+                    ),
+                  ),
+                ],
+              ),
+            ),
+          ],
+        ),
+      ],
+    ),
+  );
 }

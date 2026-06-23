@@ -92,16 +92,16 @@ class LeaveService {
       // Optional: use API code to decide success
       if (parsed.result.isNotEmpty && parsed.result.first.statusId == 200) {
         leaveTypeProvider.resetForm();
-        ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(content: Text(parsed.result.first.msg)),
-        );
+        // ScaffoldMessenger.of(context).showSnackBar(
+        //   SnackBar(content: Text(parsed.result.first.msg)),
+        // );
       } else {
         // Non-200 in payload but HTTP 200
-        ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(content: Text(parsed.result.isNotEmpty
-              ? parsed.result.first.msg
-              : 'Failed to apply for leave')),
-        );
+        // ScaffoldMessenger.of(context).showSnackBar(
+        //   SnackBar(content: Text(parsed.result.isNotEmpty
+        //       ? parsed.result.first.msg
+        //       : 'Failed to apply for leave')),
+        // );
       }
       return parsed;
     } catch (e) {

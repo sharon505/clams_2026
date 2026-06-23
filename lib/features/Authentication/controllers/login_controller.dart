@@ -8,7 +8,7 @@ import '../providers/auth_provider.dart';
 
 class LoginController {
   final employeeController = TextEditingController(
-    text: '100092'
+    // text: '100092'
     // text: '100002'
     ///patronamics
     // text: '2100047'
@@ -36,14 +36,16 @@ class LoginController {
     // text: "100059"
     // ///cij
     // text: '2431'
-    ///ccu
-    // text: '2710'
+
+    ///ccu test employee
+    text: '2710'
+
     //   text:'100095'
     //   text:'397'
   );
 
   final passwordController = TextEditingController(
-    text: '100092#123'
+    // text: '100092#123'
     // text: '123456'
     ///patronamics
     // text: '2100047#123'
@@ -71,8 +73,10 @@ class LoginController {
     // text: "Kiranv110893@"
     ///cij
     //   text: 'Varun@123'
-    ///ccu
-    // text: '2710#1234567'
+
+    ///ccu test employee
+    text: '2710#1234567'
+
     // text: '2431'
     //   text:'100095#123'
     ///ccu

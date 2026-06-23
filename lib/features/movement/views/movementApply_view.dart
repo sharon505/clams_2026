@@ -2,6 +2,8 @@ import 'package:clams/constants/app_colors.dart';
 import 'package:clams/constants/app_padding.dart';
 import 'package:clams/constants/app_textfield.dart';
 import 'package:clams/features/leaves/providers/leaveType_viewModel.dart';
+import 'package:clams/features/leaves/widgets/calendar_range_card.dart';
+import 'package:clams/features/movement/widgets/time_line_range_picker.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:provider/provider.dart';
@@ -121,78 +123,115 @@ class _MovementApplyViewState extends State<MovementApplyView> {
         body: Padding(
           padding: AppPadding.allSmall,
           child: SingleChildScrollView(
-            child: Container(
-              width: double.infinity,
-              padding: EdgeInsets.all(16.w),
-              decoration: BoxDecoration(
-                color: AppColors.white,
-                borderRadius: BorderRadius.circular(16.r),
-                boxShadow: [
-                  BoxShadow(
-                    color: Colors.black.withOpacity(0.05),
-                    blurRadius: 10,
-                    offset: const Offset(0, 4),
-                  ),
-                ],
-              ),
-              child: Column(
-                children: [
-                  /// FROM DATE
-                  CustomInputCard.textField(
-                    icon: Icons.calendar_today,
-                    label: 'Start Date',
-                    controller: vm.fromDateC,
-                    readOnly: true,
-                    hintText: _dateFromArgs
-                        ? 'Auto selected'
-                        : 'Select start date',
-                    onTap: _dateFromArgs
-                        ? null
-                        : () => vm.pickFromDate(context),
+            child: Column(
+              spacing: 10.h,
+              children: [
+                CalendarRangeCard(
+                  focusedDay: vm.fromDate ?? DateTime.now(),
+
+                  firstAllowedDate: DateTime(
+                    DateTime.now().year - 1,
+                    DateTime.now().month,
+                    DateTime.now().day,
                   ),
 
-                  /// FROM TIME
-                  CustomInputCard.textField(
-                    icon: Icons.schedule,
-                    label: 'Start Time',
-                    hintText: 'Select start time',
-                    controller: vm.fromTimeC,
-                    readOnly: true,
-                    onTap: () => vm.pickFromTime(context),
-                  ),
+                  lastAllowedDate: DateTime.now(),
 
-                  /// TO DATE
-                  CustomInputCard.textField(
-                    icon: Icons.calendar_today,
-                    label: 'End Date',
-                    controller: vm.toDateC,
-                    readOnly: true,
-                    hintText: _dateFromArgs
-                        ? 'Auto selected'
-                        : 'Select end date',
-                    onTap: _dateFromArgs
-                        ? null
-                        : () => vm.pickToDate(context),
-                  ),
+                  fromDate: vm.fromDate,
+                  toDate: vm.toDate,
 
-                  /// TO TIME
-                  CustomInputCard.textField(
-                    icon: Icons.schedule,
-                    label: 'End Time',
-                    hintText: 'Select end time',
-                    controller: vm.toTimeC,
-                    readOnly: true,
-                    onTap: () => vm.pickToTime(context),
-                  ),
+                  onSelectDay: (selectedDay, focusedDay) {
+                    vm.setFromDate(selectedDay);
 
-                  /// REASON
-                  CustomInputCard.textArea(
-                    label: "Reason",
-                    hintText: "Reason For Movement",
-                    controller: vm.reasonC,
-                  )
-                ],
-              ),
+                    /// Same day movement
+                    vm.setToDate(selectedDay);
+                  },
+                ),
+                Consumer<MovementFormViewModel>(
+                  builder: (_, vm, __) {
+                    return MovementTimePicker(
+                      startTime: vm.startTime,
+                      durationHour: vm.durationHour,
+                      onStartTimeChanged: vm.setStartTime,
+                      onDurationChanged: vm.setDuration,
+                    );
+                  },
+                ),
+                Container(
+                  width: double.infinity,
+                  padding: EdgeInsets.all(16.w),
+                  decoration: BoxDecoration(
+                    color: AppColors.white,
+                    borderRadius: BorderRadius.circular(16.r),
+                    boxShadow: [
+                      BoxShadow(
+                        color: Colors.black.withOpacity(0.05),
+                        blurRadius: 10,
+                        offset: const Offset(0, 4),
+                      ),
+                    ],
+                  ),
+                  child: Column(
+                    children: [
+
+                      /// FROM DATE
+                      // CustomInputCard.textField(
+                      //   icon: Icons.calendar_today,
+                      //   label: 'Start Date',
+                      //   controller: vm.fromDateC,
+                      //   readOnly: true,
+                      //   hintText: _dateFromArgs
+                      //       ? 'Auto selected'
+                      //       : 'Select start date',
+                      //   onTap: _dateFromArgs
+                      //       ? null
+                      //       : () => vm.pickFromDate(context),
+                      // ),
+
+                      /// FROM TIME
+                      // CustomInputCard.textField(
+                      //   icon: Icons.schedule,
+                      //   label: 'Start Time',
+                      //   hintText: 'Select start time',
+                      //   controller: vm.fromTimeC,
+                      //   readOnly: true,
+                      //   onTap: () => vm.pickFromTime(context),
+                      // ),
+
+                      /// TO DATE
+                      // CustomInputCard.textField(
+                      //   icon: Icons.calendar_today,
+                      //   label: 'End Date',
+                      //   controller: vm.toDateC,
+                      //   readOnly: true,
+                      //   hintText: _dateFromArgs
+                      //       ? 'Auto selected'
+                      //       : 'Select end date',
+                      //   onTap: _dateFromArgs
+                      //       ? null
+                      //       : () => vm.pickToDate(context),
+                      // ),
+
+                      /// TO TIME
+                      // CustomInputCard.textField(
+                      //   icon: Icons.schedule,
+                      //   label: 'End Time',
+                      //   hintText: 'Select end time',
+                      //   controller: vm.toTimeC,
+                      //   readOnly: true,
+                      //   onTap: () => vm.pickToTime(context),
+                      // ),
+
+                      /// REASON
+                      CustomInputCard.textArea(
+                        label: "Reason",
+                        hintText: "Reason For Movement",
+                        controller: vm.reasonC,
+                      )
+                    ],
+                  ),
+                ),
+              ],
             ),
           ),
         ),
