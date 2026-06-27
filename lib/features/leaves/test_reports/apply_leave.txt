@@ -1,0 +1,47 @@
+///full day ----------------------------------------------------------------------------------------
+///post --------------------------------------------------------------------------------------------
+{
+  Employeecode: 2710,
+  Company: all,
+  LeaveType: LossofPay,
+  FromDate: 2026-06-02,
+  Todate: 2026-06-02,
+  isHalfDay: false,
+  LeaveSection: Fullday,
+  LeaveReason: test,
+  CRN: 123456,
+  Version: 1.0.0
+}
+///response model ----------------------------------------------------------------------------------
+I/flutter (16222): ✅ Leave applied: {
+I/flutter (16222):   "Result": [
+I/flutter (16222):     {
+I/flutter (16222):       "StatusID": 200,
+I/flutter (16222):       "MSG": "Leave Saved!"
+I/flutter (16222):     }
+I/flutter (16222):   ]
+I/flutter (16222): }
+>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>
+///half day ----------------------------------------------------------------------------------------
+post -----------------------------------------------------------------------------------------------
+{
+  Employeecode: 2710,
+  Company: all,
+  LeaveType: LossofPay,
+  FromDate: 2026-06-01,
+  Todate: 2026-06-01,
+  isHalfDay: true,
+  LeaveSection: Afternoon,
+  LeaveReason: test,
+  CRN: 123466,
+  Version: 1.0.0
+}
+///response model ----------------------------------------------------------------------------------
+I/flutter (16222): ✅ Leave applied: {
+I/flutter (16222):   "Result": [
+I/flutter (16222):     {
+I/flutter (16222):       "StatusID": 200,
+I/flutter (16222):       "MSG": "Leave Saved!"
+I/flutter (16222):     }
+I/flutter (16222):   ]
+I/flutter (16222): }

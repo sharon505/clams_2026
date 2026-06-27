@@ -19,6 +19,19 @@ import 'package:clams/features/movement/views/movementApply_view.dart';
 import 'package:clams/features/profile/provider/LeaveBalance_viewModel.dart';
 import 'package:clams/features/profile/provider/employee_viewModel.dart';
 import 'package:clams/features/profile/views/profile_view.dart';
+import 'package:clams/features/travel/viewModels/TA_details_view_model.dart';
+import 'package:clams/features/travel/viewModels/apply_travel_requisition_viewModel.dart';
+import 'package:clams/features/travel/viewModels/cancelTravelRequestViewModel.dart';
+import 'package:clams/features/travel/viewModels/ccu_department_view_model.dart';
+import 'package:clams/features/travel/viewModels/edit_ta_request_save_view_model.dart';
+import 'package:clams/features/travel/viewModels/edit_ta_view_model.dart';
+import 'package:clams/features/travel/viewModels/get_emp_travel_details_view_model.dart';
+import 'package:clams/features/travel/viewModels/myTravelRequisitionViewModel.dart';
+import 'package:clams/features/travel/viewModels/travel_emp_details_view_model.dart';
+import 'package:clams/features/travel/viewModels/travel_requisition_textfield_view_model.dart';
+import 'package:clams/features/travel/viewModels/update_TA_view_model.dart';
+import 'package:clams/features/travel/views/applyTravel_view.dart';
+import 'package:clams/features/travel/views/travelView_view.dart';
 import 'package:clams/features/work_hours/providers/dateTime_viewModel.dart';
 import 'package:clams/features/work_hours/providers/employee_working_duration_viewModel.dart';
 import 'package:clams/features/work_hours/providers/location_viewModel.dart';
@@ -84,6 +97,18 @@ List<SingleChildWidget> providers = [
   ChangeNotifierProvider(create: (_) => MovementCancelProvider()),
   ChangeNotifierProvider(create: (_) => MovementFormViewModel()),
   ChangeNotifierProvider(create: (_) => MovementReportProvider()),
+  ///Travel---------------------------------------------------------------------
+  ChangeNotifierProvider(create: (_) => ApplyTravelRequisitionViewModel()),
+  ChangeNotifierProvider(create: (_) => CancelTravelRequestViewModel()),
+  ChangeNotifierProvider(create: (_) => CCUDepartmentViewModel()),
+  ChangeNotifierProvider(create: (_) => EditTARequestSaveViewModel()),
+  ChangeNotifierProvider(create: (_) => EditTAViewModel()),
+  ChangeNotifierProvider(create: (_) => GetEmpTravelDetailsViewModel()),
+  ChangeNotifierProvider(create: (_) => MyTravelRequisitionViewModel()),
+  ChangeNotifierProvider(create: (_) => TADetailsViewModel()),
+  ChangeNotifierProvider(create: (_) => TravelEmpDetailsViewModel()),
+  ChangeNotifierProvider(create: (_) => TravelRequisitionTextFieldViewModel()),
+  ChangeNotifierProvider(create: (_) => UpdateTAViewModel()),
 ];
 
 Map<String, Widget Function(BuildContext)> routes = <String, WidgetBuilder>{
@@ -102,6 +127,9 @@ Map<String, Widget Function(BuildContext)> routes = <String, WidgetBuilder>{
   'ProfileView':           (context) => const ProfileView(),
   ///Movement-------------------------------------------------------------------
   'ApplyMovement':         (context) => const MovementApplyView(),
+  ///Travel---------------------------------------------------------------------
+  'ApplyTravel':           (context) => const ApplyTravelView(),
+  'TravelView':            (context) => const TravelViewView(),
 };
 
 class MyApp extends StatelessWidget {

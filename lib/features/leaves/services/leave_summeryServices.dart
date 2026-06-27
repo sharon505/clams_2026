@@ -3,7 +3,6 @@ import 'package:clams/features/Authentication/providers/auth_provider.dart';
 import 'package:flutter/material.dart';
 import 'package:http/http.dart' as http;
 import 'package:provider/provider.dart';
-
 import '../../../network/app_url.dart';
 import '../models/model_leaveSummery.dart';
 
@@ -27,6 +26,8 @@ class LeaveSummaryService {
         'Company': AppUrls.companyName,
       };
 
+      debugPrint('📤 Request Body: $body');
+
       final uri = AppUrls.myLeaveSummary;
       final res = await http.post(
         uri,
@@ -42,6 +43,8 @@ class LeaveSummaryService {
 
       final Map<String, dynamic> jsonMap = json.decode(res.body) as Map<String, dynamic>;
       final parsed = LeaveSummaryResponse.fromJson(jsonMap);
+      debugPrint('🔵 JSON: $jsonMap');
+      debugPrint('🔵 Parsed Response: ${jsonEncode(parsed.toJson())}');
       return parsed;
     } catch (e) {
       debugPrint('🔴 Exception @fetchMyLeaveSummary: $e');

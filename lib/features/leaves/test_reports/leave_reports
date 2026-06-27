@@ -1,0 +1,66 @@
+///leave reports -----------------------------------------------------------------------------------
+///get ---------------------------------------------------------------------------------------------
+///body --------------------------------------------------------------------------------------------
+📤 Request Body: {EmployeeCode: 2710, Company: all}
+///response model-----------------------------------------------------------------------------------
+{
+  Result: [
+    {
+      StatusID: 200,
+      MSG: LeaveSummarySuccessfullyAdded!
+    }
+  ],
+  Table1: [
+    {
+      LeaveId: 1435295,
+      EmployeeCode: 2710,
+      FromDate: 02/06/2026,
+      Todate: 02/06/2026,
+      LeaveType: LossofPay,
+      Status: Pending,
+      AppliedTo: NAJINK,
+      isHalfDay: false,
+      leaveSection: Fullday,
+      NoOfDays: 1.0,
+      UpdatedDate: null,
+      AppliedDate: 25/06/2026,
+      LeaveReason: test,
+      Processed: 0,
+      RejectedReason:
+    },
+    {
+      LeaveId: 1435294,
+      EmployeeCode: 2710,
+      FromDate: 01/06/2026,
+      Todate: 01/06/2026,
+      LeaveType: LossofPay,
+      Status: Pending,
+      AppliedTo: NAJINK,
+      isHalfDay: true,
+      leaveSection: Afternoon,
+      NoOfDays: 0.5,
+      UpdatedDate: null,
+      AppliedDate: 25/06/2026,
+      LeaveReason: test,
+      Processed: 0,
+      RejectedReason:
+    },
+    {
+      LeaveId: 1435293,
+      EmployeeCode: 2710,
+      FromDate: 11/06/2026,
+      Todate: 11/06/2026,
+      LeaveType: LossofPay,
+      Status: Cancelled,
+      AppliedTo: NAJINK,
+      isHalfDay: false,
+      leaveSection: Fullday,
+      NoOfDays: 1.0,
+      UpdatedDate: 25/06/2026,
+      AppliedDate: 23/06/2026,
+      LeaveReason: test,
+      Processed: 0,
+      RejectedReason:
+    },
+  ]
+}

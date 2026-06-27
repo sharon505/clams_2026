@@ -2,7 +2,10 @@ class AppUrls {
 
   static const String companyName   = 'all';
 
+
   static const String version = "1.0.11+12";
+
+  static const String currentVersion = version;
 
   static const Map<String, String> header = {
     'Content-Type': 'application/x-www-form-urlencoded',

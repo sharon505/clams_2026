@@ -6,6 +6,7 @@ import 'package:clams/features/leaves/widgets/calendar_range_card.dart';
 import 'package:clams/features/movement/widgets/time_line_range_picker.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
+import 'package:fluttertoast/fluttertoast.dart';
 import 'package:provider/provider.dart';
 
 import '../viewmodel/applyMovement_viewModel.dart';
@@ -58,47 +59,42 @@ class _MovementApplyViewState extends State<MovementApplyView> {
     final applyVm = context.read<ApplyMovementViewModel>();
 
     final error = vm.validate();
+
     if (error != null) {
-      // dialog(
-      //   context: context,
-      //   name: "Form Incomplete",
-      //   designation: 'Validation Error',
-      //   departmentName: error,
-      //   btnOkOnPress: () {},
-      //   btnOkColor: AppColors.warning,
-      //   dialogType: DialogType.warning,
-      //   outsideTouch: true,
-      // );
+      Fluttertoast.showToast(
+        msg: error,
+        toastLength: Toast.LENGTH_SHORT,
+        gravity: ToastGravity.BOTTOM,
+        backgroundColor: AppColors.warning,
+        textColor: Colors.white,
+      );
       return;
     }
 
     final ok = await applyVm.submit(context);
 
     if (ok) {
-      // AwesomeDialog(
-      //   context: context,
-      //   dialogType: DialogType.success,
-      //   animType: AnimType.scale,
-      //   title: 'Success',
-      //   desc: applyVm.lastMessage ?? 'Movement submitted successfully.',
-      //   btnOkColor: Colors.green,
-      //   btnOkOnPress: () {
-      //     vm.reset();
-      //     Navigator.pop(context, true); // close AFTER user presses OK
-      //   },
-      // ).show();
+      Fluttertoast.showToast(
+        msg: applyVm.lastMessage ?? "Movement applied successfully.",
+        toastLength: Toast.LENGTH_SHORT,
+        gravity: ToastGravity.BOTTOM,
+        backgroundColor: AppColors.success,
+        textColor: Colors.white,
+      );
 
-      return; // IMPORTANT → prevents instant pop
+      vm.reset();
+
+      if (context.mounted) {
+        Navigator.pop(context, true);
+      }
     } else {
-      // dialog(
-      //   context: context,
-      //   name: "Error",
-      //   designation: 'Submission Failed',
-      //   departmentName: applyVm.errorMessage ?? 'Please try again later.',
-      //   btnOkOnPress: () {},
-      //   btnOkColor: AppColors.error,
-      //   dialogType: DialogType.error,
-      // );
+      Fluttertoast.showToast(
+        msg: applyVm.errorMessage ?? "Failed to apply movement.",
+        toastLength: Toast.LENGTH_SHORT,
+        gravity: ToastGravity.BOTTOM,
+        backgroundColor: AppColors.error,
+        textColor: Colors.white,
+      );
     }
   }
 

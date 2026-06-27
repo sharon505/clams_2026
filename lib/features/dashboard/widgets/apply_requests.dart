@@ -49,6 +49,7 @@ class ApplyRequestsCard extends StatelessWidget {
                 icon: Icons.flight,
                 backgroundColor: Color(0xFFE8F0FE),
                 iconColor: AppColors.primaryColor,
+                onTap: () => Navigator.pushNamed(context, 'ApplyTravel'),
               ),
               ApplyRequestItem(
                 title: 'Apply\nOvertime',

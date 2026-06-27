@@ -34,6 +34,11 @@ class LeaveCancelServices {
       };
 
       final uri = AppUrls.cancelEmployeeLeave;
+      debugPrint('================ Cancel Leave API ================');
+      debugPrint('🌐 URL      : $uri');
+      debugPrint('📤 Headers  : ${AppUrls.header}');
+      debugPrint('📤 Body     : ${jsonEncode(body)}');
+
       final res = await http.post(uri, headers: AppUrls.header, body: body);
 
       debugPrint('🟣 [CancelEmployeeLeave] ${res.statusCode}');
@@ -43,6 +48,17 @@ class LeaveCancelServices {
       }
 
       final map = json.decode(res.body) as Map<String, dynamic>;
+      debugPrint('📥 Parsed JSON : ${jsonEncode(map)}');
+
+      final response = CancelLeaveResponse.fromJson(map);
+
+      debugPrint(
+        '✅ StatusID : ${response.result.isNotEmpty ? response.result.first.statusId : "N/A"}',
+      );
+      debugPrint(
+        '✅ Message  : ${response.result.isNotEmpty ? response.result.first.msg : "N/A"}',
+      );
+      debugPrint('==================================================');
       return CancelLeaveResponse.fromJson(map);
     } catch (e) {
       debugPrint('🔴 Exception @cancelEmployeeLeave: $e');

@@ -25,8 +25,27 @@ class MovementTimePicker extends StatefulWidget {
   State<MovementTimePicker> createState() => _MovementTimePickerState();
 }
 
-class _MovementTimePickerState extends State<MovementTimePicker> {
+class _MovementTimePickerState extends State<MovementTimePicker>
+    with SingleTickerProviderStateMixin {
   bool showTimeline = true;
+
+  late final AnimationController _borderController;
+
+  @override
+  void initState() {
+    super.initState();
+
+    _borderController = AnimationController(
+      vsync: this,
+      duration: const Duration(seconds: 2),
+    )..repeat();
+  }
+
+  @override
+  void dispose() {
+    _borderController.dispose();
+    super.dispose();
+  }
 
   String formatTime(DateTime time) {
     return DateFormat('hh:mm a').format(time);
@@ -34,6 +53,27 @@ class _MovementTimePickerState extends State<MovementTimePicker> {
 
   DateTime get endTime =>
       widget.startTime.add(Duration(hours: widget.durationHour));
+
+  Future<void> _pickTime() async {
+    await HapticFeedback.mediumImpact();
+
+    final picked = await showTimePicker(
+      context: context,
+      initialTime: TimeOfDay.fromDateTime(widget.startTime),
+    );
+
+    if (picked != null) {
+      widget.onStartTimeChanged(
+        DateTime(
+          widget.startTime.year,
+          widget.startTime.month,
+          widget.startTime.day,
+          picked.hour,
+          picked.minute,
+        ),
+      );
+    }
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -56,15 +96,18 @@ class _MovementTimePickerState extends State<MovementTimePicker> {
             contentPadding: EdgeInsets.zero,
             title: const Text(
               "Select Movement Time",
-              style: TextStyle(fontWeight: FontWeight.w600),
+              style: TextStyle(
+                fontWeight: FontWeight.w600,
+              ),
             ),
             subtitle: Text(
               "${formatTime(widget.startTime)} ➜ ${formatTime(endTime)}",
             ),
             value: showTimeline,
             activeColor: AppColors.primaryColor,
-            onChanged: (value) async{
+            onChanged: (value) async {
               await HapticFeedback.heavyImpact();
+
               setState(() {
                 showTimeline = value;
               });
@@ -72,8 +115,8 @@ class _MovementTimePickerState extends State<MovementTimePicker> {
           ),
 
           if (showTimeline) ...[
-            Divider(),
-            /// Duration Dropdown
+            const Divider(),
+
             CustomInputCard.dropdown(
               icon: Icons.timer_outlined,
               label: "Duration",
@@ -95,7 +138,6 @@ class _MovementTimePickerState extends State<MovementTimePicker> {
 
             SizedBox(height: 20.h),
 
-            /// Start Time
             Container(
               width: double.infinity,
               padding: EdgeInsets.all(14.w),
@@ -103,46 +145,79 @@ class _MovementTimePickerState extends State<MovementTimePicker> {
                 color: AppColors.primarySecondary.withOpacity(.2),
                 borderRadius: BorderRadius.circular(14.r),
               ),
-              child: Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
+              child: Row(
                 children: [
-                  Row(
-                    children: [
-                      const Icon(
-                        Icons.play_circle_fill,
-                        color: AppColors.primaryColor,
-                      ),
-                      SizedBox(width: 8.w),
-                      const Text(
-                        "Start Time",
-                        style: TextStyle(fontWeight: FontWeight.bold),
-                      ),
-                    ],
+                  const Icon(
+                    Icons.play_circle_fill,
+                    color: AppColors.primaryColor,
                   ),
-
-                  SizedBox(height: 12.h),
-
-                  Center(
-                    child: TimePickerSpinner(
-                      time: widget.startTime,
-                      is24HourMode: false,
-                      spacing: 40,
-                      itemHeight: 50,
-                      isForce2Digits: true,
-                      normalTextStyle: const TextStyle(
-                        fontSize: 18,
-                        color: Colors.grey,
-                      ),
-                      highlightedTextStyle: const TextStyle(
-                        fontSize: 24,
+                  SizedBox(width: 8.w),
+                  const Expanded(
+                    child: Text(
+                      "Start Time",
+                      style: TextStyle(
                         fontWeight: FontWeight.bold,
-                        color: AppColors.primaryColor,
                       ),
-                      onTimeChange: (time) {
-                        widget.onStartTimeChanged(time);
-                      },
                     ),
                   ),
+
+                  AnimatedBuilder(
+                    animation: _borderController,
+                    builder: (context, child) {
+                      return Container(
+                        padding: const EdgeInsets.all(2),
+                        decoration: BoxDecoration(
+                          borderRadius: BorderRadius.circular(12),
+                          gradient: SweepGradient(
+                            startAngle: 0,
+                            endAngle: 2 * 3.1415926535,
+                            transform: GradientRotation(
+                              _borderController.value * 2 * 3.1415926535,
+                            ),
+                            colors: const [
+                              AppColors.primaryColor,
+                              Colors.transparent,
+                              AppColors.primaryColor,
+                            ],
+                          ),
+                        ),
+                        child: child,
+                      );
+                    },
+                    child: Material(
+                      color: Colors.white,
+                      borderRadius: BorderRadius.circular(10),
+                      child: InkWell(
+                        borderRadius: BorderRadius.circular(10),
+                        onTap: _pickTime,
+                        child: const Padding(
+                          padding: EdgeInsets.symmetric(
+                            horizontal: 18,
+                            vertical: 12,
+                          ),
+                          child: Row(
+                            mainAxisSize: MainAxisSize.min,
+                            children: [
+                              Icon(
+                                Icons.schedule,
+                                color: AppColors.primaryColor,
+                                size: 20,
+                              ),
+                              SizedBox(width: 8),
+                              Text(
+                                "Pick Time",
+                                style: TextStyle(
+                                  color: AppColors.primaryColor,
+                                  fontWeight: FontWeight.w600,
+                                  fontSize: 14,
+                                ),
+                              ),
+                            ],
+                          ),
+                        ),
+                      ),
+                    ),
+                  )
                 ],
               ),
             ),

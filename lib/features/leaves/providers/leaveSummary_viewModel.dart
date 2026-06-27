@@ -134,10 +134,10 @@ class LeaveSummaryProvider with ChangeNotifier {
       }
     }
 
-    debugPrint("All = ${leaveMap[LeaveFilter.all]!.length}");
-    debugPrint("Approved = ${leaveMap[LeaveFilter.approved]!.length}");
-    debugPrint("Pending = ${leaveMap[LeaveFilter.pending]!.length}");
-    debugPrint("Cancelled = ${leaveMap[LeaveFilter.cancelled]!.length}");
+    // debugPrint("All = ${leaveMap[LeaveFilter.all]!.length}");
+    // debugPrint("Approved = ${leaveMap[LeaveFilter.approved]!.length}");
+    // debugPrint("Pending = ${leaveMap[LeaveFilter.pending]!.length}");
+    // debugPrint("Cancelled = ${leaveMap[LeaveFilter.cancelled]!.length}");
   }
 
   Future<bool> load({

@@ -52,6 +52,8 @@ class LeaveSummaryCard extends StatelessWidget {
         statusColor = Colors.orange;
     }
 
+    final canDelete = s == "pending";
+
     return Container(
       margin: EdgeInsets.symmetric(horizontal: 16.w, vertical: 8.h),
       padding: AppPadding.cardPadding,
@@ -90,33 +92,31 @@ class LeaveSummaryCard extends StatelessWidget {
                       ),
                     ),
 
-
                     Row(
                       spacing: 6.w,
                       children: [
                         _statusChip(status, statusColor),
                         _dateChip(statusDate, statusColor),
                       ],
-                    )
+                    ),
                   ],
                 ),
               ),
 
-              Column(
-                spacing: 3.h,
+              Row(
+                mainAxisSize: MainAxisSize.min,
+                spacing: 10.h,
                 crossAxisAlignment: CrossAxisAlignment.end,
                 children: [
+                  if (showDelete && canDelete)
+                    _deleteButton(onDelete),
                   _arrowButton(onTap),
-
-                  // _dateChip(statusDate, statusColor),
                 ],
               ),
             ],
           ),
 
-
           Divider(color: Colors.grey.shade200),
-
 
           /// BODY
           Row(
@@ -143,7 +143,6 @@ class LeaveSummaryCard extends StatelessWidget {
 
               Container(width: 1, height: 120.h, color: Colors.grey.shade200),
 
-
               Expanded(
                 child: Column(
                   spacing: 7.h,
@@ -164,19 +163,6 @@ class LeaveSummaryCard extends StatelessWidget {
               ),
             ],
           ),
-
-          if (showDelete) ...[
-
-            Align(
-              alignment: Alignment.centerRight,
-              child: deleting
-                  ? const CircularProgressIndicator()
-                  : IconButton(
-                      onPressed: onDelete,
-                      icon: const Icon(Icons.delete, color: Colors.red),
-                    ),
-            ),
-          ],
         ],
       ),
     );
@@ -215,10 +201,7 @@ class LeaveSummaryCard extends StatelessWidget {
 
   Widget _dateChip(String date, Color color) {
     return Container(
-      padding: EdgeInsets.symmetric(
-        horizontal: 6.w,
-        vertical: 3.h,
-      ),
+      padding: EdgeInsets.symmetric(horizontal: 6.w, vertical: 3.h),
       decoration: BoxDecoration(
         color: color.withOpacity(.10),
         borderRadius: BorderRadius.circular(5.r),
@@ -235,6 +218,26 @@ class LeaveSummaryCard extends StatelessWidget {
     );
   }
 
+  Widget _deleteButton(VoidCallback? onDelete) {
+    return InkWell(
+      borderRadius: BorderRadius.circular(18.r),
+      onTap: onDelete,
+      child: Container(
+        width: 30.w,
+        height: 30.w,
+        decoration: BoxDecoration(
+          shape: BoxShape.circle,
+          border: Border.all(color: Colors.red, width: 1),
+        ),
+        child: Icon(
+          Icons.delete_outline_rounded,
+          color: Colors.red,
+          size: 16.sp,
+        ),
+      ),
+    );
+  }
+
   Widget _arrowButton(VoidCallback? onTap) {
     return InkWell(
       borderRadius: BorderRadius.circular(18.r),
@@ -244,10 +247,7 @@ class LeaveSummaryCard extends StatelessWidget {
         height: 30.w,
         decoration: BoxDecoration(
           shape: BoxShape.circle,
-          border: Border.all(
-            color: AppColors.primaryColor,
-            width: 1,
-          ),
+          border: Border.all(color: AppColors.primaryColor, width: 1),
         ),
         child: Icon(
           Icons.chevron_right_rounded,
@@ -258,11 +258,7 @@ class LeaveSummaryCard extends StatelessWidget {
     );
   }
 
-  Widget _infoTile(
-      IconData icon,
-      String title,
-      String value,
-      ) {
+  Widget _infoTile(IconData icon, String title, String value) {
     return Row(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
@@ -273,11 +269,7 @@ class LeaveSummaryCard extends StatelessWidget {
             color: const Color(0xffEEF3FB),
             shape: BoxShape.circle,
           ),
-          child: Icon(
-            icon,
-            color: const Color(0xff6C7F95),
-            size: 20.sp,
-          ),
+          child: Icon(icon, color: const Color(0xff6C7F95), size: 20.sp),
         ),
 
         SizedBox(width: 10.w),

@@ -1,5 +1,7 @@
+import 'package:clams/constants/app_dialog.dart';
 import 'package:clams/constants/app_padding.dart';
 import 'package:clams/features/leaves/providers/LeaveFilter_viewModel.dart';
+import 'package:clams/features/leaves/providers/leaveCancel_viewModel.dart';
 import 'package:clams/features/leaves/providers/leaveSummary_viewModel.dart';
 import 'package:clams/features/leaves/widgets/leave_summary_card.dart';
 import 'package:flutter/material.dart';
@@ -69,14 +71,13 @@ class _LeavesViewState extends State<LeavesView>
 
   @override
   Widget build(BuildContext context) {
-
     return Scaffold(
       backgroundColor: const Color(0xFFF8F9FC),
       appBar: AppBar(
         elevation: 0,
         backgroundColor: AppColors.primaryBg,
         foregroundColor: Colors.white,
-        centerTitle: false,
+        centerTitle: true,
 
         title: Text(
           "Leaves",
@@ -254,12 +255,52 @@ class _LeavesViewState extends State<LeavesView>
                 statusDate: leave.updatedDate ?? "-",
                 approvedBy: leave.appliedTo,
                 days: leave.noOfDays.toString(),
+                showDelete: true,
+                onDelete: () => AppDialog.confirmation(
+                  context: context,
+                  title: "Cancel Leave",
+                  message:
+                      "Are you sure you want to cancel this leave request?",
+                  confirmText: "Accept",
+                    onConfirm: () async {
+                      final cancelProvider = context.read<LeaveCancelProvider>();
+                      final summaryProvider = context.read<LeaveSummaryProvider>();
+
+                      final success = await cancelProvider.cancel(
+                        context: context,
+                        leaveId: leave.leaveId,
+                      );
+
+                      if (success) {
+                        await summaryProvider.load(context: context);
+
+                        ScaffoldMessenger.of(context).showSnackBar(
+                          SnackBar(
+                            content: Text(
+                              cancelProvider.lastResponse?.result.first.msg ??
+                                  "Leave cancelled successfully.",
+                            ),
+                            backgroundColor: Colors.green,
+                          ),
+                        );
+                      } else {
+                        ScaffoldMessenger.of(context).showSnackBar(
+                          SnackBar(
+                            content: Text(
+                              cancelProvider.error ??
+                                  cancelProvider.lastResponse?.result.first.msg ??
+                                  "Failed to cancel leave.",
+                            ),
+                            backgroundColor: Colors.red,
+                          ),
+                        );
+                      }
+                    }
+                ),
                 onTap: () => Navigator.pushNamed(
                   context,
                   'LeaveDetailsScreen',
-                  arguments: {
-                    "leave": leave,
-                  },
+                  arguments: {"leave": leave},
                 ),
               );
             },
